@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHO-UMC 인과성 평가 카테고리별 ADR 보고 분포</title>
 <meta name="description" content="WHO-UMC 기준 ADR 인과성 카테고리별 실제 보고 빈도와 비율을 문헌 기반으로 시각화한 약물감시(PV) 학습 자료입니다.">
+<meta property="og:title" content="WHO-UMC 인과성 평가 — ADR 카테고리별 분포">
+<meta property="og:description" content="Pharmacovigilance(PV) 실무에서 실제로 어떤 인과성 카테고리가 많이 보고될까? 문헌 3편 비교 시각화.">
+<meta property="og:type" content="article">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,9 +21,9 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   --accent: #2563eb;
-  --c-possible:     #7c3aed;
-  --c-probable:     #2563eb;
   --c-certain:      #059669;
+  --c-probable:     #2563eb;
+  --c-possible:     #7c3aed;
   --c-unlikely:     #d97706;
   --c-conditional:  #dc2626;
   --c-unassessable: #64748b;
@@ -35,22 +39,51 @@ body {
   margin: 0 auto;
 }
 
-/* Header */
-.header { text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
-.label-tag {
-  display: inline-block; background: #dbeafe; color: #1d4ed8;
-  font-size: 0.63rem; font-weight: 800; letter-spacing: 1.2px;
-  text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border);
 }
-.header h1 { font-size: clamp(1.1rem, 4vw, 1.4rem); font-weight: 800; margin-bottom: 8px; line-height: 1.4; }
+.header .label {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+.header h1 {
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
 .header p { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.7; }
 
-/* Tabs */
-.tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.tabs {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
 .tab {
-  padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--border);
-  background: var(--surface); color: var(--text-secondary);
-  font-size: 0.75rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 .tab:hover { border-color: var(--accent); color: var(--accent); }
 .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -59,203 +92,174 @@ body {
 .view.active { display: block; }
 
 .section-label {
-  font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;
-  letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
-/* Card */
-.card {
-  background: var(--surface); border-radius: 12px; padding: 20px 16px;
-  margin-bottom: 14px; border: 1px solid var(--border);
+.chart-box {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 20px 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.card h3 { font-size: 0.82rem; font-weight: 700; margin-bottom: 16px; }
+.chart-box.h300 { height: 300px; position: relative; }
+.chart-box.h230 { height: 230px; position: relative; }
 
-/* ── 도넛 차트 (SVG) ── */
-.donut-wrap {
-  display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center;
+.cat-list {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 18px 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.donut-wrap svg { flex-shrink: 0; }
-.donut-legend { display: flex; flex-direction: column; gap: 8px; }
-.legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; }
-.legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.legend-name { color: var(--text-primary); font-weight: 600; min-width: 140px; }
-.legend-pct { color: var(--text-secondary); font-weight: 700; }
+.cat-list h3 { font-size: 0.82rem; color: var(--text-primary); margin-bottom: 16px; font-weight: 700; }
 
-/* ── 바 차트 ── */
-.bar-chart { width: 100%; }
-.bc-row { display: grid; grid-template-columns: 90px 1fr 44px; align-items: center; gap: 10px; margin-bottom: 12px; }
-.bc-label { font-size: 0.72rem; font-weight: 700; color: var(--text-primary); text-align: right; }
-.bc-track { height: 22px; background: var(--surface2); border-radius: 4px; overflow: hidden; position: relative; }
-.bc-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; display: flex; align-items: center; }
-.bc-pct { font-size: 0.7rem; font-weight: 800; text-align: right; }
+.cat-item { margin-bottom: 14px; }
+.cat-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cat-name { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.cat-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: 1px; line-height: 1.5; }
+.cat-pct { font-size: 0.9rem; font-weight: 800; text-align: right; }
+.bar-wrap { height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; }
 
-/* ── 연구별 미니 바 ── */
 .study-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .study-card {
-  background: var(--surface); border-radius: 12px; padding: 14px 12px;
-  border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 10px;
+  border: 1px solid var(--border);
+  height: 195px;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.study-card h3 { font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: 700; line-height: 1.5; }
-.mini-bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-.mini-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.mini-label { font-size: 0.6rem; color: var(--text-secondary); width: 66px; flex-shrink: 0; }
-.mini-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-.mini-fill { height: 100%; border-radius: 3px; }
-.mini-pct { font-size: 0.6rem; font-weight: 700; width: 32px; text-align: right; flex-shrink: 0; }
+.study-card h3 { font-size: 0.61rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 700; line-height: 1.5; }
 
-/* ── 그룹 바 차트 ── */
-.group-chart { width: 100%; overflow-x: auto; }
-.group-inner { min-width: 340px; }
-.group-bars { display: flex; align-items: flex-end; gap: 6px; height: 160px; margin-bottom: 6px; padding: 0 4px; }
-.group-col { display: flex; align-items: flex-end; gap: 3px; flex: 1; }
-.group-bar { flex: 1; border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
-.group-bar:hover::after {
-  content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-  background: #0f172a; color: #fff; font-size: 0.6rem; padding: 3px 6px; border-radius: 4px;
-  white-space: nowrap; pointer-events: none; margin-bottom: 4px;
-}
-.group-x { display: flex; gap: 6px; padding: 0 4px; }
-.group-x-label { flex: 1; font-size: 0.6rem; color: var(--text-muted); text-align: center; }
-.group-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-.gl-item { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--text-secondary); }
-.gl-dot { width: 9px; height: 9px; border-radius: 2px; }
-
-/* ── 판단기준 카드 ── */
 .crit-card {
-  background: var(--surface); border-radius: 12px; padding: 16px;
-  border: 1px solid var(--border); margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .crit-card h3 { font-size: 0.85rem; font-weight: 800; margin-bottom: 10px; }
-.crit-card ul { list-style: none; font-size: 0.72rem; color: var(--text-secondary); line-height: 2.1; }
-.pct-note {
+.crit-card ul { list-style: none; font-size: 0.72rem; color: var(--text-secondary); line-height: 2; }
+.crit-card .pct-note {
   font-size: 0.66rem; font-weight: 700; margin-top: 8px;
   padding: 4px 10px; border-radius: 6px; display: inline-block;
 }
 
-/* Note */
 .note {
-  background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
-  padding: 14px 16px; font-size: 0.72rem; color: #1e40af; line-height: 1.8; margin-bottom: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.72rem;
+  color: #1e40af;
+  line-height: 1.8;
+  margin-bottom: 14px;
 }
 .note strong { color: #1d4ed8; display: block; margin-bottom: 4px; font-size: 0.75rem; }
 
-/* Footer */
 .footer {
-  text-align: center; margin-top: 28px; font-size: 0.63rem;
-  color: var(--text-muted); line-height: 1.9; border-top: 1px solid var(--border); padding-top: 16px;
+  text-align: center;
+  margin-top: 28px;
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
 }
 
-@media (max-width: 420px) {
+@media (max-width: 400px) {
   .study-grid { grid-template-columns: 1fr; }
-  .bc-row { grid-template-columns: 70px 1fr 40px; }
-  .donut-legend .legend-name { min-width: 110px; }
+  .study-card { height: 170px; }
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <span class="label-tag">Pharmacovigilance · PV 학습자료</span>
+  <span class="label">Pharmacovigilance · PV 학습자료</span>
   <h1>WHO-UMC 인과성 평가<br>카테고리별 ADR 보고 분포</h1>
   <p>Certain / Probable / Possible / Unlikely / Conditional / Unassessable<br>문헌 3편 기반 실제 보고 빈도 시각화</p>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('overview',this)">📊 전체 개요</button>
-  <button class="tab" onclick="switchTab('studies',this)">🔬 연구별 비교</button>
-  <button class="tab" onclick="switchTab('criteria',this)">📋 판단 기준</button>
+  <button class="tab active" onclick="switchTab('overview', this)">📊 전체 개요</button>
+  <button class="tab" onclick="switchTab('studies', this)">🔬 연구별 비교</button>
+  <button class="tab" onclick="switchTab('criteria', this)">📋 판단 기준</button>
 </div>
 
-<!-- ═══ VIEW 1: Overview ═══ -->
+<!-- VIEW 1 -->
 <div class="view active" id="view-overview">
   <p class="section-label">문헌 통합 추정 평균 분포</p>
-
-  <div class="card">
-    <div class="donut-wrap">
-      <!-- SVG 도넛 차트 (외부 라이브러리 없음) -->
-      <svg width="180" height="180" viewBox="0 0 180 180">
-        <!-- Possible 50% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#7c3aed" stroke-width="36"
-          stroke-dasharray="219.9 439.8" stroke-dashoffset="0" transform="rotate(-90 90 90)"/>
-        <!-- Probable 30% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#2563eb" stroke-width="36"
-          stroke-dasharray="131.9 439.8" stroke-dashoffset="-219.9" transform="rotate(-90 90 90)"/>
-        <!-- Certain 5% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#059669" stroke-width="36"
-          stroke-dasharray="22.0 439.8" stroke-dashoffset="-351.8" transform="rotate(-90 90 90)"/>
-        <!-- Unlikely 5% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#d97706" stroke-width="36"
-          stroke-dasharray="22.0 439.8" stroke-dashoffset="-373.8" transform="rotate(-90 90 90)"/>
-        <!-- Conditional 6% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#dc2626" stroke-width="36"
-          stroke-dasharray="26.4 439.8" stroke-dashoffset="-395.8" transform="rotate(-90 90 90)"/>
-        <!-- Unassessable 4% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#64748b" stroke-width="36"
-          stroke-dasharray="17.6 439.8" stroke-dashoffset="-422.2" transform="rotate(-90 90 90)"/>
-        <!-- 중앙 흰 원 -->
-        <circle cx="90" cy="90" r="52" fill="white"/>
-        <text x="90" y="86" text-anchor="middle" font-size="13" font-weight="800" fill="#0f172a">추정</text>
-        <text x="90" y="102" text-anchor="middle" font-size="11" fill="#475569">평균 분포</text>
-      </svg>
-      <div class="donut-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div><span class="legend-name">Possible</span><span class="legend-pct">~50%</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div><span class="legend-name">Probable</span><span class="legend-pct">~30%</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#059669"></div><span class="legend-name">Certain</span><span class="legend-pct">~5%</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div><span class="legend-name">Unlikely</span><span class="legend-pct">~5%</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div><span class="legend-name">Conditional</span><span class="legend-pct">~6%</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div><span class="legend-name">Unassessable</span><span class="legend-pct">~4%</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
+  <div class="chart-box h300"><canvas id="donutChart"></canvas></div>
+  <div class="cat-list">
     <h3>카테고리별 상세</h3>
-    <div class="bar-chart">
-      <div class="bc-row">
-        <div class="bc-label">Possible</div>
-        <div class="bc-track"><div class="bc-fill" style="width:50%;background:#7c3aed"></div></div>
-        <div class="bc-pct" style="color:#7c3aed">~50%</div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-possible)"></div>
+        <div><div class="cat-name">Possible</div><div class="cat-desc">다른 원인도 설명 가능 · 시간적 연관성 있음</div></div>
+        <div class="cat-pct" style="color:var(--c-possible)">~50%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 10px 100px">다른 원인도 설명 가능 · 시간적 연관성 있음</div>
-
-      <div class="bc-row">
-        <div class="bc-label">Probable</div>
-        <div class="bc-track"><div class="bc-fill" style="width:30%;background:#2563eb"></div></div>
-        <div class="bc-pct" style="color:#2563eb">~30%</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-possible);width:50%"></div></div>
+    </div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-probable)"></div>
+        <div><div class="cat-name">Probable</div><div class="cat-desc">다른 원인 가능성 낮음 · dechallenge 양성</div></div>
+        <div class="cat-pct" style="color:var(--c-probable)">~30%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 10px 100px">다른 원인 가능성 낮음 · dechallenge 양성</div>
-
-      <div class="bc-row">
-        <div class="bc-label">Certain</div>
-        <div class="bc-track"><div class="bc-fill" style="width:5%;background:#059669"></div></div>
-        <div class="bc-pct" style="color:#059669">~5%</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-probable);width:30%"></div></div>
+    </div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-certain)"></div>
+        <div><div class="cat-name">Certain</div><div class="cat-desc">rechallenge 양성 · 다른 원인 완전 배제</div></div>
+        <div class="cat-pct" style="color:var(--c-certain)">~5%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 10px 100px">rechallenge 양성 · 다른 원인 완전 배제</div>
-
-      <div class="bc-row">
-        <div class="bc-label">Unlikely</div>
-        <div class="bc-track"><div class="bc-fill" style="width:5%;background:#d97706"></div></div>
-        <div class="bc-pct" style="color:#d97706">~5%</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-certain);width:5%"></div></div>
+    </div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-unlikely)"></div>
+        <div><div class="cat-name">Unlikely</div><div class="cat-desc">시간적 연관성 희박 · 다른 원인이 더 설득력</div></div>
+        <div class="cat-pct" style="color:var(--c-unlikely)">~5%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 10px 100px">시간적 연관성 희박 · 다른 원인이 더 설득력</div>
-
-      <div class="bc-row">
-        <div class="bc-label">Conditional</div>
-        <div class="bc-track"><div class="bc-fill" style="width:6%;background:#dc2626"></div></div>
-        <div class="bc-pct" style="color:#dc2626">~6%</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-unlikely);width:5%"></div></div>
+    </div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-conditional)"></div>
+        <div><div class="cat-name">Conditional / Unclassified</div><div class="cat-desc">추가 데이터 필요 · 평가 보류 상태</div></div>
+        <div class="cat-pct" style="color:var(--c-conditional)">~6%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 10px 100px">추가 데이터 필요 · 평가 보류 상태</div>
-
-      <div class="bc-row">
-        <div class="bc-label">Unassessable</div>
-        <div class="bc-track"><div class="bc-fill" style="width:4%;background:#64748b"></div></div>
-        <div class="bc-pct" style="color:#64748b">~4%</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-conditional);width:6%"></div></div>
+    </div>
+    <div class="cat-item">
+      <div class="cat-row">
+        <div class="cat-dot" style="background:var(--c-unassessable)"></div>
+        <div><div class="cat-name">Unassessable / Unclassifiable</div><div class="cat-desc">정보 불충분 또는 모순 · 평가 자체 불가</div></div>
+        <div class="cat-pct" style="color:var(--c-unassessable)">~4%</div>
       </div>
-      <div style="font-size:0.63rem;color:var(--text-muted);margin:-6px 0 4px 100px">정보 불충분 또는 모순 · 평가 자체 불가</div>
+      <div class="bar-wrap"><div class="bar-fill" style="background:var(--c-unassessable);width:4%"></div></div>
     </div>
   </div>
-
   <div class="note">
     <strong>⚠️ 해석 주의사항</strong>
     이 분포는 단일 DB가 아닌 여러 독립 연구의 문헌 기반 추정치입니다.
@@ -264,105 +268,16 @@ body {
   </div>
 </div>
 
-<!-- ═══ VIEW 2: Studies ═══ -->
+<!-- VIEW 2 -->
 <div class="view" id="view-studies">
   <p class="section-label">개별 연구 분포 비교</p>
-
   <div class="study-grid">
-    <!-- 연구 A -->
-    <div class="study-card">
-      <h3>연구 A<br>India · 842건<br>자발보고 (2016–18)</h3>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Certain</span><div class="mini-track"><div class="mini-fill" style="width:3%;background:#059669"></div></div><span class="mini-pct" style="color:#059669">3%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#2563eb"></div><span class="mini-label">Probable</span><div class="mini-track"><div class="mini-fill" style="width:23%;background:#2563eb"></div></div><span class="mini-pct" style="color:#2563eb">23%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#7c3aed"></div><span class="mini-label">Possible</span><div class="mini-track"><div class="mini-fill" style="width:73%;background:#7c3aed"></div></div><span class="mini-pct" style="color:#7c3aed">73%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#d97706"></div><span class="mini-label">Unlikely</span><div class="mini-track"><div class="mini-fill" style="width:1%;background:#d97706"></div></div><span class="mini-pct" style="color:#d97706">1%</span></div>
-    </div>
-    <!-- 연구 B -->
-    <div class="study-card">
-      <h3>연구 B<br>India · 313건<br>능동감시 (2020–23)</h3>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Certain</span><div class="mini-track"><div class="mini-fill" style="width:1.3%;background:#059669"></div></div><span class="mini-pct" style="color:#059669">1%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#2563eb"></div><span class="mini-label">Probable</span><div class="mini-track"><div class="mini-fill" style="width:90%;background:#2563eb"></div></div><span class="mini-pct" style="color:#2563eb">90%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#7c3aed"></div><span class="mini-label">Possible</span><div class="mini-track"><div class="mini-fill" style="width:8.3%;background:#7c3aed"></div></div><span class="mini-pct" style="color:#7c3aed">8%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#d97706"></div><span class="mini-label">Unlikely</span><div class="mini-track"><div class="mini-fill" style="width:0%;background:#d97706"></div></div><span class="mini-pct" style="color:#d97706">0%</span></div>
-    </div>
-    <!-- 연구 C -->
-    <div class="study-card">
-      <h3>연구 C<br>Brazil · 90건<br>고복잡도 병원</h3>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Certain</span><div class="mini-track"><div class="mini-fill" style="width:9.6%;background:#059669"></div></div><span class="mini-pct" style="color:#059669">10%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#2563eb"></div><span class="mini-label">Probable</span><div class="mini-track"><div class="mini-fill" style="width:34%;background:#2563eb"></div></div><span class="mini-pct" style="color:#2563eb">34%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#7c3aed"></div><span class="mini-label">Possible</span><div class="mini-track"><div class="mini-fill" style="width:43%;background:#7c3aed"></div></div><span class="mini-pct" style="color:#7c3aed">43%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#d97706"></div><span class="mini-label">Unlikely</span><div class="mini-track"><div class="mini-fill" style="width:8%;background:#d97706"></div></div><span class="mini-pct" style="color:#d97706">8%</span></div>
-    </div>
-    <!-- 연구 D -->
-    <div class="study-card">
-      <h3>연구 D<br>WHO 원문<br>일반 원칙 기반 추정</h3>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Certain</span><div class="mini-track"><div class="mini-fill" style="width:5%;background:#059669"></div></div><span class="mini-pct" style="color:#059669">5%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#2563eb"></div><span class="mini-label">Probable</span><div class="mini-track"><div class="mini-fill" style="width:20%;background:#2563eb"></div></div><span class="mini-pct" style="color:#2563eb">20%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#7c3aed"></div><span class="mini-label">Possible</span><div class="mini-track"><div class="mini-fill" style="width:55%;background:#7c3aed"></div></div><span class="mini-pct" style="color:#7c3aed">55%</span></div>
-      <div class="mini-bar-row"><div class="mini-dot" style="background:#d97706"></div><span class="mini-label">Unlikely</span><div class="mini-track"><div class="mini-fill" style="width:5%;background:#d97706"></div></div><span class="mini-pct" style="color:#d97706">5%</span></div>
-    </div>
+    <div class="study-card"><h3>연구 A<br>India · 842건<br>자발보고 (2016–18)</h3><canvas id="studyA"></canvas></div>
+    <div class="study-card"><h3>연구 B<br>India · 313건<br>능동감시 (2020–23)</h3><canvas id="studyB"></canvas></div>
+    <div class="study-card"><h3>연구 C<br>Brazil · 90건<br>고복잡도 병원</h3><canvas id="studyC"></canvas></div>
+    <div class="study-card"><h3>연구 D<br>WHO 원문<br>일반 원칙 기반 추정</h3><canvas id="studyD"></canvas></div>
   </div>
-
-  <!-- 그룹 바 차트 -->
-  <div class="card">
-    <h3>3개 연구 비교</h3>
-    <div class="group-chart">
-      <div class="group-inner">
-        <div class="group-bars">
-          <!-- Certain -->
-          <div class="group-col">
-            <div class="group-bar" style="height:4.8%;background:#059669cc" data-tip="연구A: 3%"></div>
-            <div class="group-bar" style="height:2%;background:#2563ebcc" data-tip="연구B: 1.3%"></div>
-            <div class="group-bar" style="height:15.4%;background:#059669" data-tip="연구C: 9.6%"></div>
-          </div>
-          <!-- Probable -->
-          <div class="group-col">
-            <div class="group-bar" style="height:36.9%;background:#059669cc" data-tip="연구A: 23%"></div>
-            <div class="group-bar" style="height:100%;background:#2563ebcc" data-tip="연구B: 90.4%"></div>
-            <div class="group-bar" style="height:55.2%;background:#059669" data-tip="연구C: 34.4%"></div>
-          </div>
-          <!-- Possible -->
-          <div class="group-col">
-            <div class="group-bar" style="height:100%;background:#7c3aedcc" data-tip="연구A: 73%"></div>
-            <div class="group-bar" style="height:13.3%;background:#2563ebcc" data-tip="연구B: 8.3%"></div>
-            <div class="group-bar" style="height:69.4%;background:#7c3aed" data-tip="연구C: 43%"></div>
-          </div>
-          <!-- Unlikely -->
-          <div class="group-col">
-            <div class="group-bar" style="height:1.6%;background:#d97706cc" data-tip="연구A: 1%"></div>
-            <div class="group-bar" style="height:2%;background:#2563ebcc" data-tip="연구B: 0%"></div>
-            <div class="group-bar" style="height:12.9%;background:#d97706" data-tip="연구C: 8%"></div>
-          </div>
-          <!-- Conditional -->
-          <div class="group-col">
-            <div class="group-bar" style="height:2%;background:#dc2626cc" data-tip="연구A: 0%"></div>
-            <div class="group-bar" style="height:2%;background:#2563ebcc" data-tip="연구B: 0%"></div>
-            <div class="group-bar" style="height:3.2%;background:#dc2626" data-tip="연구C: 2%"></div>
-          </div>
-          <!-- Unassessable -->
-          <div class="group-col">
-            <div class="group-bar" style="height:2%;background:#64748bcc" data-tip="연구A: 0%"></div>
-            <div class="group-bar" style="height:2%;background:#2563ebcc" data-tip="연구B: 0%"></div>
-            <div class="group-bar" style="height:4.8%;background:#64748b" data-tip="연구C: 3%"></div>
-          </div>
-        </div>
-        <div class="group-x">
-          <div class="group-x-label">Certain</div>
-          <div class="group-x-label">Probable</div>
-          <div class="group-x-label">Possible</div>
-          <div class="group-x-label">Unlikely</div>
-          <div class="group-x-label">Cond.</div>
-          <div class="group-x-label">Unass.</div>
-        </div>
-        <div class="group-legend">
-          <div class="gl-item"><div class="gl-dot" style="background:#059669cc"></div>연구A (자발보고)</div>
-          <div class="gl-item"><div class="gl-dot" style="background:#2563ebcc"></div>연구B (능동감시)</div>
-          <div class="gl-item"><div class="gl-dot" style="background:#7c3aed"></div>연구C (Brazil)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <div class="chart-box h230"><canvas id="groupedBar"></canvas></div>
   <div class="note">
     <strong>📌 연구 간 편차가 큰 이유</strong>
     연구 A (인도 자발보고): Possible 73%, Probable 23% — 정보 부족 케이스 多, Possible 쏠림<br>
@@ -372,41 +287,39 @@ body {
   </div>
 </div>
 
-<!-- ═══ VIEW 3: Criteria ═══ -->
+<!-- VIEW 3 -->
 <div class="view" id="view-criteria">
   <p class="section-label">WHO-UMC 판단 기준 요약</p>
-
-  <div class="crit-card" style="border-left:4px solid #059669">
-    <h3 style="color:#059669">✅ Certain</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-certain)">
+    <h3 style="color:var(--c-certain)">✅ Certain</h3>
     <ul><li>✔ 합리적인 시간적 선후관계</li><li>✔ dechallenge 양성 (중단 시 호전)</li><li>✔ rechallenge 양성 (재투여 시 재발)</li><li>✔ 다른 약물·질환으로 설명 불가</li></ul>
     <span class="pct-note" style="background:#d1fae5;color:#065f46">실제 보고율 ~1–5% · rechallenge 요건이 장벽</span>
   </div>
-  <div class="crit-card" style="border-left:4px solid #2563eb">
-    <h3 style="color:#2563eb">🔵 Probable</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-probable)">
+    <h3 style="color:var(--c-probable)">🔵 Probable</h3>
     <ul><li>✔ 합리적인 시간적 선후관계</li><li>✔ dechallenge 양성</li><li>✔ 다른 원인으로 설명하기 어려움</li><li>— rechallenge 정보 없어도 됨</li></ul>
     <span class="pct-note" style="background:#dbeafe;color:#1e40af">입원 환자 능동감시에서 ~30–90%</span>
   </div>
-  <div class="crit-card" style="border-left:4px solid #7c3aed">
-    <h3 style="color:#7c3aed">🟣 Possible</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-possible)">
+    <h3 style="color:var(--c-possible)">🟣 Possible</h3>
     <ul><li>✔ 합리적인 시간적 선후관계</li><li>⚠ 다른 원인(질환·병용약)으로도 설명 가능</li><li>⚠ dechallenge 정보 없거나 불명확</li></ul>
     <span class="pct-note" style="background:#ede9fe;color:#5b21b6">자발보고 시스템에서 가장 많음 ~40–73%</span>
   </div>
-  <div class="crit-card" style="border-left:4px solid #d97706">
-    <h3 style="color:#d97706">🟡 Unlikely</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-unlikely)">
+    <h3 style="color:var(--c-unlikely)">🟡 Unlikely</h3>
     <ul><li>⚠ 시간적 연관성 희박하거나 불가능</li><li>⚠ 다른 원인이 더 설득력 있음</li></ul>
     <span class="pct-note" style="background:#fef3c7;color:#92400e">ADR DB에서 가장 적음 ~1–5%</span>
   </div>
-  <div class="crit-card" style="border-left:4px solid #dc2626">
-    <h3 style="color:#dc2626">🔴 Conditional / Unclassified</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-conditional)">
+    <h3 style="color:var(--c-conditional)">🔴 Conditional / Unclassified</h3>
     <ul><li>⚠ 이상반응은 있으나 데이터 불충분</li><li>⚠ 추가 데이터 수집 후 재평가 필요</li></ul>
     <span class="pct-note" style="background:#fee2e2;color:#991b1b">판단 보류 상태</span>
   </div>
-  <div class="crit-card" style="border-left:4px solid #64748b">
-    <h3 style="color:#64748b">⚫ Unassessable / Unclassifiable</h3>
+  <div class="crit-card" style="border-left:4px solid var(--c-unassessable)">
+    <h3 style="color:var(--c-unassessable)">⚫ Unassessable / Unclassifiable</h3>
     <ul><li>✖ 보고 정보가 불충분하거나 모순됨</li><li>✖ 추가 데이터로도 평가 불가한 구조적 문제</li></ul>
     <span class="pct-note" style="background:#f1f5f9;color:#475569">보고 품질 문제 반영</span>
   </div>
-
   <div class="note">
     <strong>🔑 PV 실무 핵심 포인트</strong>
     규제 목적상 drug-related = Certain + Probable + Possible<br>
@@ -421,6 +334,95 @@ body {
 </div>
 
 <script>
+const CATS = ['Certain','Probable','Possible','Unlikely','Conditional','Unassessable'];
+const C    = ['#059669','#2563eb','#7c3aed','#d97706','#dc2626','#64748b'];
+const DONUT_C = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#64748b']; // Possible 먼저
+
+window.addEventListener('load', function() {
+  setTimeout(function() {
+
+    // ── Donut ──
+    new Chart(document.getElementById('donutChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Possible','Probable','Certain','Unlikely','Conditional','Unassessable'],
+        datasets: [{
+          data: [50, 30, 5, 5, 6, 4],
+          backgroundColor: DONUT_C,
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#334155', font: { size: 11 }, padding: 10, boxWidth: 12 }
+          },
+          tooltip: { callbacks: { label: function(c){ return ' ' + c.label + ': ' + c.parsed + '%'; } } }
+        },
+        cutout: '58%'
+      }
+    });
+
+    // ── Mini donuts ──
+    function mini(id, data) {
+      new Chart(document.getElementById(id), {
+        type: 'doughnut',
+        data: {
+          labels: CATS,
+          datasets: [{ data: data, backgroundColor: C, borderColor: '#fff', borderWidth: 2 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: function(c){ return ' ' + c.label + ': ' + c.parsed + '%'; } } }
+          },
+          cutout: '50%'
+        }
+      });
+    }
+    mini('studyA', [3,   23,   73,  1,   0, 0]);
+    mini('studyB', [1.3, 90.4,  8.3, 0,   0, 0]);
+    mini('studyC', [9.6, 34.4, 43,  8,   2, 3]);
+    mini('studyD', [5,   20,   55,  5,   8, 7]);
+
+    // ── Grouped bar ──
+    new Chart(document.getElementById('groupedBar'), {
+      type: 'bar',
+      data: {
+        labels: ['Certain','Probable','Possible','Unlikely','Cond.','Unassess.'],
+        datasets: [
+          { label: '연구A (자발보고)', data: [3,   23,   73,  1, 0, 0], backgroundColor: '#7c3aedbb' },
+          { label: '연구B (능동감시)', data: [1.3, 90.4,  8.3, 0, 0, 0], backgroundColor: '#2563ebbb' },
+          { label: '연구C (Brazil)',   data: [9.6, 34.4, 43,  8, 2, 3], backgroundColor: '#059669bb' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#e2e8f0' } },
+          y: {
+            ticks: { color: '#64748b', font: { size: 9 }, callback: function(v){ return v + '%'; } },
+            grid: { color: '#e2e8f0' }, max: 100
+          }
+        },
+        plugins: {
+          legend: { labels: { color: '#334155', font: { size: 10 }, boxWidth: 10, padding: 8 } },
+          tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + c.parsed.y + '%'; } } }
+        }
+      }
+    });
+
+  }, 150);
+});
+
 function switchTab(id, btn) {
   document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
