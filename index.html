@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/USER/Downloads/index_v3.html -->
-<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHO-UMC 인과성 평가 카테고리별 ADR 보고 분포</title>
 <meta name="description" content="WHO-UMC 기준 ADR 인과성 카테고리별 실제 보고 빈도와 비율을 문헌 기반으로 시각화한 약물감시(PV) 학습 자료입니다.">
@@ -162,9 +162,9 @@ body {
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab(&#39;overview&#39;,this)">📊 전체 개요</button>
-  <button class="tab" onclick="switchTab(&#39;studies&#39;,this)">🔬 연구별 비교</button>
-  <button class="tab" onclick="switchTab(&#39;criteria&#39;,this)">📋 판단 기준</button>
+  <button class="tab active" onclick="switchTab('overview',this)">📊 전체 개요</button>
+  <button class="tab" onclick="switchTab('studies',this)">🔬 연구별 비교</button>
+  <button class="tab" onclick="switchTab('criteria',this)">📋 판단 기준</button>
 </div>
 
 <!-- ═══ VIEW 1: Overview ═══ -->
@@ -176,19 +176,25 @@ body {
       <!-- SVG 도넛 차트 (외부 라이브러리 없음) -->
       <svg width="180" height="180" viewBox="0 0 180 180">
         <!-- Possible 50% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#7c3aed" stroke-width="36" stroke-dasharray="219.9 439.8" stroke-dashoffset="0" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#7c3aed" stroke-width="36"
+          stroke-dasharray="219.9 439.8" stroke-dashoffset="0" transform="rotate(-90 90 90)"/>
         <!-- Probable 30% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#2563eb" stroke-width="36" stroke-dasharray="131.9 439.8" stroke-dashoffset="-219.9" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#2563eb" stroke-width="36"
+          stroke-dasharray="131.9 439.8" stroke-dashoffset="-219.9" transform="rotate(-90 90 90)"/>
         <!-- Certain 5% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#059669" stroke-width="36" stroke-dasharray="22.0 439.8" stroke-dashoffset="-351.8" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#059669" stroke-width="36"
+          stroke-dasharray="22.0 439.8" stroke-dashoffset="-351.8" transform="rotate(-90 90 90)"/>
         <!-- Unlikely 5% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#d97706" stroke-width="36" stroke-dasharray="22.0 439.8" stroke-dashoffset="-373.8" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#d97706" stroke-width="36"
+          stroke-dasharray="22.0 439.8" stroke-dashoffset="-373.8" transform="rotate(-90 90 90)"/>
         <!-- Conditional 6% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#dc2626" stroke-width="36" stroke-dasharray="26.4 439.8" stroke-dashoffset="-395.8" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#dc2626" stroke-width="36"
+          stroke-dasharray="26.4 439.8" stroke-dashoffset="-395.8" transform="rotate(-90 90 90)"/>
         <!-- Unassessable 4% -->
-        <circle cx="90" cy="90" r="70" fill="none" stroke="#64748b" stroke-width="36" stroke-dasharray="17.6 439.8" stroke-dashoffset="-422.2" transform="rotate(-90 90 90)"></circle>
+        <circle cx="90" cy="90" r="70" fill="none" stroke="#64748b" stroke-width="36"
+          stroke-dasharray="17.6 439.8" stroke-dashoffset="-422.2" transform="rotate(-90 90 90)"/>
         <!-- 중앙 흰 원 -->
-        <circle cx="90" cy="90" r="52" fill="white"></circle>
+        <circle cx="90" cy="90" r="52" fill="white"/>
         <text x="90" y="86" text-anchor="middle" font-size="13" font-weight="800" fill="#0f172a">추정</text>
         <text x="90" y="102" text-anchor="middle" font-size="11" fill="#475569">평균 분포</text>
       </svg>
@@ -422,6 +428,5 @@ function switchTab(id, btn) {
   btn.classList.add('active');
 }
 </script>
-
-
-</body></html>
+</body>
+</html>
