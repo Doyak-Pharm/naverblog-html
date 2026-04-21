@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도형 순서 기억하기 N-back 연습</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; color: #1a1a1a; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; color: #1a1a1a; }
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+  .controls label { font-size: 13px; color: #666; }
+  .controls select { font-size: 13px; border: 1px solid #ccc; border-radius: 8px; padding: 5px 10px; background: #fff; color: #1a1a1a; }
+  .start-btn { padding: 0.5rem 1.5rem; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; font-weight: 500; transition: background 0.15s; }
+  .start-btn:hover { background: #f0f0f0; }
+  .header { display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; justify-content: center; }
+  .stat { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; padding: 0.6rem 1rem; font-size: 13px; color: #666; text-align: center; min-width: 80px; }
+  .stat span { font-size: 18px; font-weight: 600; color: #1a1a1a; display: block; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; width: 100%; max-width: 420px; }
+  .shape-box { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; border-radius: 16px; background: #fff; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .shape-box svg { width: 120px; height: 120px; }
+  .timer-txt { position: absolute; top: 8px; right: 12px; font-size: 14px; font-weight: 600; color: #888; }
+  .timer-txt.urgent { color: #c0392b; }
+  .timerbar-wrap { width: 180px; height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+  .timerbar { height: 5px; background: #3498db; border-radius: 3px; transition: width 0.1s linear, background 0.3s; }
+  .btns { display: flex; gap: 16px; }
+  .btn { padding: 0.7rem 2.5rem; border-radius: 10px; border: 1.5px solid #ccc; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; font-weight: 500; transition: background 0.1s, transform 0.1s; }
+  .btn:hover:not(:disabled) { background: #f5f5f5; }
+  .btn:active:not(:disabled) { transform: scale(0.97); }
+  .btn.same { border-color: #3498db; color: #1a6aab; }
+  .btn.same:hover:not(:disabled) { background: #eaf3fb; }
+  .btn.diff { border-color: #999; color: #555; }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  .feedback { font-size: 14px; font-weight: 600; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #c0392b; }
+  .feedback.timeout { color: #e67e22; }
+  .progress { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 320px; }
+  .prog-dot { width: 9px; height: 9px; border-radius: 50%; background: #ddd; }
+  .prog-dot.done-correct { background: #27ae60; }
+  .prog-dot.done-wrong { background: #e74c3c; }
+  .prog-dot.done-timeout { background: #e67e22; }
+  .prog-dot.current { background: #3498db; }
+  .waiting { font-size: 14px; color: #888; }
+  .shape-label { font-size: 13px; color: #888; text-align: center; }
+  .result-box { background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; padding: 2rem; text-align: center; max-width: 300px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .result-box h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; }
+  .result-score { font-size: 48px; font-weight: 700; margin: 0.5rem 0; color: #1a1a1a; }
+  .result-detail { font-size: 13px; color: #888; margin-bottom: 0.75rem; }
+  .result-msg { font-size: 14px; color: #333; margin-bottom: 1rem; }
+  .intro { color: #888; font-size: 14px; padding: 3rem 0; }
+  .tip { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.75rem 1rem; font-size: 13px; color: #555; max-width: 380px; text-align: center; line-height: 1.6; }
+  .tip strong { color: #3498db; }
+</style>
+</head>
+<body>
+
+<h1>도형 순서 기억하기 — N-back 연습</h1>
+
+<div class="controls">
+  <label>난이도</label>
+  <select id="nb-n">
+    <option value="2">2-back</option>
+    <option value="3">3-back</option>
+  </select>
+  <label>문항 수</label>
+  <select id="nb-total">
+    <option value="15">15문항</option>
+    <option value="20">20문항</option>
+    <option value="30">30문항</option>
+  </select>
+  <button class="start-btn" onclick="startGame()">시작</button>
+</div>
+
+<div class="header">
+  <div class="stat">문항 <span id="nb-cur">-</span></div>
+  <div class="stat">정답 <span id="nb-correct">-</span></div>
+  <div class="stat">오답 <span id="nb-wrong">-</span></div>
+  <div class="stat">정확도 <span id="nb-acc">-</span></div>
+</div>
+
+<div class="stage" id="nb-stage">
+  <div class="intro">시작 버튼을 눌러 게임을 시작하세요.</div>
+  <div class="tip"><strong>팁:</strong> 도형이 나올 때마다 이름을 머릿속으로 중얼거리세요.<br>예: "세모 → 원 → 마름모 → 지금 세모? 2개 전도 세모였나?"</div>
+</div>
+
+<script>
+const SHAPES = [
+  { name: '세모',      svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,88 8,88" fill="#1AACAA"/></svg>' },
+  { name: '원',        svg: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="#1AACAA"/></svg>' },
+  { name: '사각형',   svg: '<svg viewBox="0 0 100 100"><rect x="12" y="12" width="76" height="76" fill="#1AACAA"/></svg>' },
+  { name: '사다리꼴', svg: '<svg viewBox="0 0 100 100"><polygon points="20,80 80,80 65,20 35,20" fill="#1AACAA"/></svg>' },
+  { name: '모래시계', svg: '<svg viewBox="0 0 100 100"><polygon points="10,10 90,10 50,50 90,90 10,90 50,50" fill="#1AACAA"/></svg>' },
+  { name: '다이아몬드', svg: '<svg viewBox="0 0 100 100"><polygon points="50,5 85,35 50,95 15,35" fill="#1AACAA"/></svg>' },
+  { name: '마름모',   svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,50 50,92 8,50" fill="#1AACAA"/></svg>' },
+  { name: '나비넥타이', svg: '<svg viewBox="0 0 100 100"><polygon points="10,20 50,50 10,80" fill="#1AACAA"/><polygon points="90,20 50,50 90,80" fill="#1AACAA"/></svg>' },
+  { name: '별',        svg: '<svg viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#1AACAA"/></svg>' },
+  { name: '퍼즐',     svg: '<svg viewBox="0 0 100 100"><rect x="10" y="10" width="38" height="38" fill="#1AACAA"/><rect x="52" y="52" width="38" height="38" fill="#1AACAA"/><rect x="10" y="52" width="18" height="38" fill="#1AACAA"/><rect x="72" y="10" width="18" height="38" fill="#1AACAA"/></svg>' },
+  { name: '역나비',   svg: '<svg viewBox="0 0 100 100"><polygon points="15,15 85,15 50,55" fill="#1AACAA"/><polygon points="15,85 85,85 50,55" fill="#1AACAA"/></svg>' },
+  { name: '성모양',   svg: '<svg viewBox="0 0 100 100"><rect x="30" y="50" width="40" height="40" fill="#1AACAA"/><rect x="15" y="30" width="18" height="30" fill="#1AACAA"/><rect x="67" y="30" width="18" height="30" fill="#1AACAA"/><rect x="41" y="15" width="18" height="25" fill="#1AACAA"/></svg>' },
+  { name: '이중삼각', svg: '<svg viewBox="0 0 100 100"><polygon points="50,10 88,48 12,48" fill="#1AACAA"/><polygon points="50,52 88,90 12,90" fill="#1AACAA"/></svg>' },
+  { name: '엑스',     svg: '<svg viewBox="0 0 100 100"><polygon points="20,8 50,38 80,8 92,20 62,50 92,80 80,92 50,62 20,92 8,80 38,50 8,20" fill="#1AACAA"/></svg>' },
+  { name: '왕관',     svg: '<svg viewBox="0 0 100 100"><polygon points="10,85 10,40 28,60 50,15 72,60 90,40 90,85" fill="#1AACAA"/></svg>' },
+];
+
+const TIME_LIMIT = 3000;
+let seq=[], answers=[], userAnswers=[], current=0, N=2, total=20;
+let gameActive=false, answered=false, seqTimer=null, barTimer=null;
+
+function startGame() {
+  clearTimeout(seqTimer); clearInterval(barTimer);
+  N = parseInt(document.getElementById('nb-n').value);
+  total = parseInt(document.getElementById('nb-total').value);
+  seq=[]; answers=[]; userAnswers=[]; current=0; gameActive=true; answered=false;
+  for (let i=0; i<total; i++) {
+    let shape;
+    if (i>=N && Math.random()<0.35) { shape=seq[i-N]; answers.push(true); }
+    else {
+      let c=SHAPES.filter(s=>i<N||s.name!==seq[i-N].name);
+      if(!c.length) c=SHAPES;
+      shape=c[Math.floor(Math.random()*c.length)];
+      answers.push(false);
+    }
+    seq.push(shape);
+  }
+  updateStats(); showQuestion();
+}
+
+function showQuestion() {
+  if (current>=total) { showResult(); return; }
+  answered=false;
+  const shape=seq[current], isNback=current>=N;
+  const stage=document.getElementById('nb-stage');
+
+  let prog='';
+  for(let i=0;i<total;i++){
+    let cls='';
+    if(i<current&&i>=N){ cls=userAnswers[i]===null?'done-timeout':userAnswers[i]===answers[i]?'done-correct':'done-wrong'; }
+    else if(i===current) cls='current';
+    prog+=`<div class="prog-dot ${cls}"></div>`;
+  }
+
+  stage.innerHTML=`
+    <div class="progress">${prog}</div>
+    <div style="font-size:13px;color:#888;">${N}개 전 도형과 같으면 "같다", 다르면 "다르다"</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div class="shape-box">
+        ${shape.svg}
+        ${isNback?`<div class="timer-txt" id="nb-timer-txt">3</div>`:''}
+      </div>
+      <div class="timerbar-wrap" style="display:${isNback?'block':'none'}">
+        <div class="timerbar" id="nb-timerbar" style="width:100%"></div>
+      </div>
+      <div class="shape-label">${shape.name}</div>
+    </div>
+    ${isNback?`
+      <div class="btns">
+        <button class="btn same" onclick="answer(true)">같다</button>
+        <button class="btn diff" onclick="answer(false)">다르다</button>
+      </div>
+      <div class="feedback" id="nb-fb"></div>
+    `:`<div class="waiting">${N}개 전까지는 기억하는 단계입니다...</div>`}
+    <div style="font-size:12px;color:#bbb;">${current+1} / ${total}</div>
+  `;
+
+  if (!isNback) { userAnswers.push(null); seqTimer=setTimeout(()=>{current++;showQuestion();},1800); }
+  else startTimer();
+}
+
+function startTimer() {
+  let elapsed=0;
+  const bar=document.getElementById('nb-timerbar'), txt=document.getElementById('nb-timer-txt');
+  barTimer=setInterval(()=>{
+    elapsed+=100;
+    const rem=Math.max(0,TIME_LIMIT-elapsed);
+    const pct=Math.round(rem/TIME_LIMIT*100);
+    if(bar){ bar.style.width=pct+'%'; bar.style.background=rem<=800?'#e74c3c':rem<=1500?'#e67e22':'#3498db'; }
+    if(txt){ txt.textContent=Math.ceil(rem/1000); txt.className='timer-txt'+(rem<=800?' urgent':''); }
+    if(elapsed>=TIME_LIMIT){ clearInterval(barTimer); onTimeout(); }
+  },100);
+}
+
+function onTimeout() {
+  if(answered) return;
+  answered=true; userAnswers.push(null);
+  const fb=document.getElementById('nb-fb');
+  if(fb){ fb.textContent='시간 초과! ('+(answers[current]?'같은 도형이었어요':'다른 도형이었어요')+')'; fb.className='feedback timeout'; }
+  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  updateStats();
+  seqTimer=setTimeout(()=>{current++;showQuestion();},900);
+}
+
+function answer(val) {
+  if(answered) return;
+  answered=true; clearInterval(barTimer); userAnswers.push(val);
+  const correct=val===answers[current];
+  const fb=document.getElementById('nb-fb');
+  if(fb){ fb.textContent=correct?'정답!':`오답 (${answers[current]?'같은 도형이었어요':'다른 도형이었어요'})`; fb.className='feedback '+(correct?'correct':'wrong'); }
+  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  updateStats();
+  seqTimer=setTimeout(()=>{current++;showQuestion();},900);
+}
+
+function updateStats() {
+  let c=0,w=0,t=0;
+  for(let i=N;i<userAnswers.length;i++){
+    if(userAnswers[i]===null){t++;continue;}
+    if(userAnswers[i]===answers[i])c++;else w++;
+  }
+  const tot=c+w+t, acc=tot>0?Math.round(c/tot*100):'-';
+  document.getElementById('nb-cur').textContent=gameActive?`${current+1} / ${total}`:'-';
+  document.getElementById('nb-correct').textContent=gameActive?c:'-';
+  document.getElementById('nb-wrong').textContent=gameActive?`${w}${t>0?' (+'+t+'초과)':''}`:'-';
+  document.getElementById('nb-acc').textContent=gameActive?(acc==='-'?'-':acc+'%'):'-';
+}
+
+function showResult() {
+  gameActive=false; clearInterval(barTimer);
+  let c=0,w=0,t=0;
+  for(let i=N;i<userAnswers.length;i++){
+    if(userAnswers[i]===null){t++;continue;}
+    if(userAnswers[i]===answers[i])c++;else w++;
+  }
+  const tot=c+w+t, acc=tot>0?Math.round(c/tot*100):0;
+  const msg=acc>=80?'훌륭해요! 실전 준비 됐어요 💪':acc>=60?'좋아요! 조금만 더 연습하면 돼요.':'계속 연습하면 금방 늘어요!';
+  document.getElementById('nb-stage').innerHTML=`
+    <div class="result-box">
+      <h3>결과</h3>
+      <div class="result-score">${acc}%</div>
+      <div class="result-detail">정답 ${c}개 / 오답 ${w}개 / 시간초과 ${t}개</div>
+      <div class="result-msg">${msg}</div>
+      <button class="start-btn" onclick="startGame()">다시 하기</button>
+    </div>
+  `;
+  document.getElementById('nb-cur').textContent=`${total} / ${total}`;
+  document.getElementById('nb-acc').textContent=acc+'%';
+}
+</script>
+</body>
+</html>
