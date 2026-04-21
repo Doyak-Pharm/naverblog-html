@@ -7,22 +7,24 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; color: #1a1a1a; }
-  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; color: #1a1a1a; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; }
   .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
   .controls label { font-size: 13px; color: #666; }
   .controls select { font-size: 13px; border: 1px solid #ccc; border-radius: 8px; padding: 5px 10px; background: #fff; color: #1a1a1a; }
-  .start-btn { padding: 0.5rem 1.5rem; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; font-weight: 500; transition: background 0.15s; }
+  .start-btn { padding: 0.5rem 1.5rem; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; font-weight: 500; }
   .start-btn:hover { background: #f0f0f0; }
   .header { display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; justify-content: center; }
   .stat { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; padding: 0.6rem 1rem; font-size: 13px; color: #666; text-align: center; min-width: 80px; }
   .stat span { font-size: 18px; font-weight: 600; color: #1a1a1a; display: block; }
-  .stage { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; width: 100%; max-width: 420px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; width: 100%; max-width: 520px; }
   .shape-box { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; border-radius: 16px; background: #fff; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .shape-box svg { width: 120px; height: 120px; }
   .timer-txt { position: absolute; top: 8px; right: 12px; font-size: 14px; font-weight: 600; color: #888; }
   .timer-txt.urgent { color: #c0392b; }
   .timerbar-wrap { width: 180px; height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
   .timerbar { height: 5px; background: #3498db; border-radius: 3px; transition: width 0.1s linear, background 0.3s; }
+
+  /* 일반 모드 버튼 */
   .btns { display: flex; gap: 16px; }
   .btn { padding: 0.7rem 2.5rem; border-radius: 10px; border: 1.5px solid #ccc; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; font-weight: 500; transition: background 0.1s, transform 0.1s; }
   .btn:hover:not(:disabled) { background: #f5f5f5; }
@@ -31,26 +33,65 @@
   .btn.same:hover:not(:disabled) { background: #eaf3fb; }
   .btn.diff { border-color: #999; color: #555; }
   .btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* 실전 모드 버튼 */
+  .real-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+  .real-btn { display: flex; align-items: center; gap: 14px; padding: 0.75rem 1.25rem; border-radius: 10px; border: 1.5px solid #ccc; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; font-weight: 500; transition: background 0.1s, transform 0.1s; text-align: left; }
+  .real-btn:hover:not(:disabled) { background: #f5f5f5; }
+  .real-btn:active:not(:disabled) { transform: scale(0.98); }
+  .real-btn:disabled { opacity: 0.35; cursor: default; }
+  .real-btn.none-btn { border-color: #999; }
+  .real-btn.two-btn  { border-color: #3498db; color: #1a6aab; }
+  .real-btn.two-btn:hover:not(:disabled)  { background: #eaf3fb; }
+  .real-btn.three-btn { border-color: #8e44ad; color: #6c3483; }
+  .real-btn.three-btn:hover:not(:disabled) { background: #f5eef8; }
+  .key-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 60px; padding: 3px 8px; border-radius: 6px; border: 1px solid #ccc; background: #f5f5f5; font-size: 12px; font-weight: 600; color: #444; flex-shrink: 0; }
+
   .feedback { font-size: 14px; font-weight: 600; min-height: 22px; }
   .feedback.correct { color: #27ae60; }
   .feedback.wrong { color: #c0392b; }
   .feedback.timeout { color: #e67e22; }
-  .progress { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 320px; }
+  .progress { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 360px; }
   .prog-dot { width: 9px; height: 9px; border-radius: 50%; background: #ddd; }
   .prog-dot.done-correct { background: #27ae60; }
   .prog-dot.done-wrong { background: #e74c3c; }
   .prog-dot.done-timeout { background: #e67e22; }
   .prog-dot.current { background: #3498db; }
   .waiting { font-size: 14px; color: #888; }
-  .shape-label { font-size: 13px; color: #888; text-align: center; }
-  .result-box { background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; padding: 2rem; text-align: center; max-width: 300px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-  .result-box h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; }
-  .result-score { font-size: 48px; font-weight: 700; margin: 0.5rem 0; color: #1a1a1a; }
+  .shape-label { font-size: 13px; color: #888; }
+  .result-box { background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; padding: 2rem; text-align: center; width: 100%; max-width: 340px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .result-score { font-size: 48px; font-weight: 700; margin: 0.5rem 0; }
   .result-detail { font-size: 13px; color: #888; margin-bottom: 0.75rem; }
   .result-msg { font-size: 14px; color: #333; margin-bottom: 1rem; }
   .intro { color: #888; font-size: 14px; padding: 3rem 0; }
-  .tip { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.75rem 1rem; font-size: 13px; color: #555; max-width: 380px; text-align: center; line-height: 1.6; }
+  .tip { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.75rem 1rem; font-size: 13px; color: #555; max-width: 400px; text-align: center; line-height: 1.6; }
   .tip strong { color: #3498db; }
+  .mode-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.5rem; }
+  .mode-badge.real { background: #fef6ed; color: #e67e22; border: 1px solid #f0a500; }
+  .mode-badge.normal { background: #eaf3fb; color: #1a6aab; border: 1px solid #3498db; }
+
+  /* 복기 */
+  .review-wrap { width: 100%; max-width: 680px; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0; }
+  .review-title { font-size: 15px; font-weight: 600; margin-bottom: 0.75rem; text-align: center; }
+  .review-legend { display: flex; gap: 14px; justify-content: center; margin-bottom: 1.25rem; font-size: 12px; color: #666; flex-wrap: wrap; }
+  .review-legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .review-sequence { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .review-card { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 80px; }
+  .review-card-box { width: 68px; height: 68px; border-radius: 10px; border: 2px solid #e0e0e0; background: #fff; display: flex; align-items: center; justify-content: center; position: relative; }
+  .review-card-box svg { width: 42px; height: 42px; }
+  .review-card-box.correct { border-color: #27ae60; background: #f0faf4; }
+  .review-card-box.wrong { border-color: #e74c3c; background: #fdf0f0; }
+  .review-card-box.timeout { border-color: #e67e22; background: #fef6ed; }
+  .review-card-box.memory { border-color: #ddd; background: #fafafa; }
+  .review-card-num { position: absolute; top: 2px; left: 5px; font-size: 10px; font-weight: 600; color: #aaa; }
+  .review-card-name { font-size: 11px; color: #666; text-align: center; }
+  .review-card-status { font-size: 10px; font-weight: 600; text-align: center; }
+  .review-card-status.correct { color: #27ae60; }
+  .review-card-status.wrong { color: #e74c3c; }
+  .review-card-status.timeout { color: #e67e22; }
+  .review-card-status.memory { color: #bbb; }
+  .review-card-ref { font-size: 10px; color: #aaa; text-align: center; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -58,10 +99,11 @@
 <h1>도형 순서 기억하기 — N-back 연습</h1>
 
 <div class="controls">
-  <label>난이도</label>
-  <select id="nb-n">
+  <label>모드</label>
+  <select id="nb-mode" onchange="onModeChange()">
     <option value="2">2-back</option>
     <option value="3">3-back</option>
+    <option value="real">실전 (2+3 동시)</option>
   </select>
   <label>문항 수</label>
   <select id="nb-total">
@@ -81,8 +123,10 @@
 
 <div class="stage" id="nb-stage">
   <div class="intro">시작 버튼을 눌러 게임을 시작하세요.</div>
-  <div class="tip"><strong>팁:</strong> 도형이 나올 때마다 이름을 머릿속으로 중얼거리세요.<br>예: "세모 → 원 → 마름모 → 지금 세모? 2개 전도 세모였나?"</div>
+  <div class="tip"><strong>팁:</strong> 도형이 나올 때마다 이름을 머릿속으로 중얼거리세요.<br>실전 모드: SPACE=다름, ←=2번째 전과 같음, →=3번째 전과 같음</div>
 </div>
+
+<div id="review-area"></div>
 
 <script>
 const SHAPES = [
@@ -104,24 +148,51 @@ const SHAPES = [
 ];
 
 const TIME_LIMIT = 3000;
-let seq=[], answers=[], userAnswers=[], current=0, N=2, total=20;
+// seq: 도형 배열
+// answers: 일반모드=true/false, 실전모드='none'|'two'|'three'
+// userAnswers: 동일 형식
+let seq=[], answers=[], userAnswers=[], current=0, mode='2', total=20;
 let gameActive=false, answered=false, seqTimer=null, barTimer=null;
+
+function onModeChange() {
+  // 모드 바꿔도 별도 처리 없음
+}
+
+function getRealAnswer(i) {
+  // 실전: 3개 전이 같으면 'three', 2개 전이 같으면 'two', 둘 다 아님 'none'
+  const twoMatch  = i>=2 && seq[i].name===seq[i-2].name;
+  const threeMatch= i>=3 && seq[i].name===seq[i-3].name;
+  if (threeMatch) return 'three';
+  if (twoMatch)   return 'two';
+  return 'none';
+}
 
 function startGame() {
   clearTimeout(seqTimer); clearInterval(barTimer);
-  N = parseInt(document.getElementById('nb-n').value);
+  mode = document.getElementById('nb-mode').value;
   total = parseInt(document.getElementById('nb-total').value);
   seq=[]; answers=[]; userAnswers=[]; current=0; gameActive=true; answered=false;
+  document.getElementById('review-area').innerHTML = '';
+
+  // 시퀀스 생성
   for (let i=0; i<total; i++) {
     let shape;
-    if (i>=N && Math.random()<0.35) { shape=seq[i-N]; answers.push(true); }
-    else {
-      let c=SHAPES.filter(s=>i<N||s.name!==seq[i-N].name);
-      if(!c.length) c=SHAPES;
-      shape=c[Math.floor(Math.random()*c.length)];
-      answers.push(false);
+    if (mode==='real') {
+      // 실전: 랜덤 생성 후 정답 계산
+      shape = SHAPES[Math.floor(Math.random()*SHAPES.length)];
+      seq.push(shape);
+      answers.push(i>=3 ? getRealAnswer(i) : 'memory');
+    } else {
+      const N = parseInt(mode);
+      if (i>=N && Math.random()<0.35) { shape=seq[i-N]; answers.push(true); }
+      else {
+        let c=SHAPES.filter(s=>i<N||s.name!==seq[i-N].name);
+        if(!c.length) c=SHAPES;
+        shape=c[Math.floor(Math.random()*c.length)];
+        answers.push(false);
+      }
+      seq.push(shape);
     }
-    seq.push(shape);
   }
   updateStats(); showQuestion();
 }
@@ -129,42 +200,91 @@ function startGame() {
 function showQuestion() {
   if (current>=total) { showResult(); return; }
   answered=false;
-  const shape=seq[current], isNback=current>=N;
+  const shape=seq[current];
+  const isReal = mode==='real';
+  const N = isReal ? 3 : parseInt(mode);
+  const isActive = current >= N; // 판단 가능 구간
   const stage=document.getElementById('nb-stage');
 
   let prog='';
   for(let i=0;i<total;i++){
     let cls='';
-    if(i<current&&i>=N){ cls=userAnswers[i]===null?'done-timeout':userAnswers[i]===answers[i]?'done-correct':'done-wrong'; }
-    else if(i===current) cls='current';
+    const iAct = isReal ? i>=3 : i>=parseInt(mode);
+    if(i<current && iAct){
+      cls = userAnswers[i]===null ? 'done-timeout' :
+            (isReal ? (userAnswers[i]===answers[i]?'done-correct':'done-wrong')
+                    : (userAnswers[i]===answers[i]?'done-correct':'done-wrong'));
+    } else if(i===current) cls='current';
     prog+=`<div class="prog-dot ${cls}"></div>`;
   }
 
+  const modeBadge = isReal
+    ? `<div class="mode-badge real">실전 모드</div>`
+    : `<div class="mode-badge normal">${mode}-back</div>`;
+
+  let buttonsHTML = '';
+  if (isActive) {
+    if (isReal) {
+      buttonsHTML = `
+        <div class="real-btns" id="real-btns">
+          <button class="real-btn none-btn" onclick="answerReal('none')" id="btn-none">
+            <span class="key-badge">SPACE</span> 다름 (둘 다 아님)
+          </button>
+          <button class="real-btn two-btn" onclick="answerReal('two')" id="btn-two">
+            <span class="key-badge">← 왼쪽</span> 같음 (2번째 전)
+          </button>
+          <button class="real-btn three-btn" onclick="answerReal('three')" id="btn-three">
+            <span class="key-badge">→ 오른쪽</span> 같음 (3번째 전)
+          </button>
+        </div>
+      `;
+    } else {
+      buttonsHTML = `
+        <div class="btns">
+          <button class="btn same" onclick="answer(true)">같다</button>
+          <button class="btn diff" onclick="answer(false)">다르다</button>
+        </div>
+      `;
+    }
+  }
+
   stage.innerHTML=`
+    ${modeBadge}
     <div class="progress">${prog}</div>
-    <div style="font-size:13px;color:#888;">${N}개 전 도형과 같으면 "같다", 다르면 "다르다"</div>
+    <div style="font-size:13px;color:#888;">
+      ${isReal ? '2번째 전 또는 3번째 전 도형과 같은지 판단하세요' : `${mode}개 전 도형과 같으면 "같다", 다르면 "다르다"`}
+    </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
       <div class="shape-box">
         ${shape.svg}
-        ${isNback?`<div class="timer-txt" id="nb-timer-txt">3</div>`:''}
+        ${isActive?`<div class="timer-txt" id="nb-timer-txt">3</div>`:''}
       </div>
-      <div class="timerbar-wrap" style="display:${isNback?'block':'none'}">
+      <div class="timerbar-wrap" style="display:${isActive?'block':'none'}">
         <div class="timerbar" id="nb-timerbar" style="width:100%"></div>
       </div>
       <div class="shape-label">${shape.name}</div>
     </div>
-    ${isNback?`
-      <div class="btns">
-        <button class="btn same" onclick="answer(true)">같다</button>
-        <button class="btn diff" onclick="answer(false)">다르다</button>
-      </div>
-      <div class="feedback" id="nb-fb"></div>
-    `:`<div class="waiting">${N}개 전까지는 기억하는 단계입니다...</div>`}
+    ${isActive ? buttonsHTML : `<div class="waiting">앞 도형들을 기억하는 단계입니다...</div>`}
+    <div class="feedback" id="nb-fb"></div>
     <div style="font-size:12px;color:#bbb;">${current+1} / ${total}</div>
   `;
 
-  if (!isNback) { userAnswers.push(null); seqTimer=setTimeout(()=>{current++;showQuestion();},1800); }
-  else startTimer();
+  if (!isActive) {
+    userAnswers.push(null);
+    seqTimer=setTimeout(()=>{current++;showQuestion();},1800);
+  } else {
+    startTimer();
+    if (isReal) setupKeyboard();
+  }
+}
+
+function setupKeyboard() {
+  document.onkeydown = function(e) {
+    if (!gameActive || answered) return;
+    if (e.code==='Space')      { e.preventDefault(); answerReal('none'); }
+    if (e.code==='ArrowLeft')  { e.preventDefault(); answerReal('two'); }
+    if (e.code==='ArrowRight') { e.preventDefault(); answerReal('three'); }
+  };
 }
 
 function startTimer() {
@@ -183,11 +303,16 @@ function startTimer() {
 function onTimeout() {
   if(answered) return;
   answered=true; userAnswers.push(null);
+  document.onkeydown = null;
   const fb=document.getElementById('nb-fb');
-  if(fb){ fb.textContent='시간 초과! ('+(answers[current]?'같은 도형이었어요':'다른 도형이었어요')+')'; fb.className='feedback timeout'; }
-  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const correct = answers[current];
+  const correctLabel = mode==='real'
+    ? (correct==='none'?'다름':correct==='two'?'2번째 전과 같음':'3번째 전과 같음')
+    : (correct?'같다':'다르다');
+  if(fb){ fb.textContent=`시간 초과! (정답: ${correctLabel})`; fb.className='feedback timeout'; }
+  document.querySelectorAll('.btn,.real-btn').forEach(b=>b.disabled=true);
   updateStats();
-  seqTimer=setTimeout(()=>{current++;showQuestion();},900);
+  seqTimer=setTimeout(()=>{current++;showQuestion();},1000);
 }
 
 function answer(val) {
@@ -195,15 +320,32 @@ function answer(val) {
   answered=true; clearInterval(barTimer); userAnswers.push(val);
   const correct=val===answers[current];
   const fb=document.getElementById('nb-fb');
-  if(fb){ fb.textContent=correct?'정답!':`오답 (${answers[current]?'같은 도형이었어요':'다른 도형이었어요'})`; fb.className='feedback '+(correct?'correct':'wrong'); }
+  if(fb){ fb.textContent=correct?'정답!':`오답 (정답: ${answers[current]?'같다':'다르다'})`; fb.className='feedback '+(correct?'correct':'wrong'); }
   document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
   updateStats();
   seqTimer=setTimeout(()=>{current++;showQuestion();},900);
 }
 
+function answerReal(val) {
+  if(answered) return;
+  answered=true; clearInterval(barTimer);
+  document.onkeydown = null;
+  userAnswers.push(val);
+  const correct=val===answers[current];
+  const fb=document.getElementById('nb-fb');
+  const valLabel = val==='none'?'다름':val==='two'?'2번째 전과 같음':'3번째 전과 같음';
+  const correctLabel = answers[current]==='none'?'다름':answers[current]==='two'?'2번째 전과 같음':'3번째 전과 같음';
+  if(fb){ fb.textContent=correct?'정답!':`오답 — 내 선택: ${valLabel} / 정답: ${correctLabel}`; fb.className='feedback '+(correct?'correct':'wrong'); }
+  document.querySelectorAll('.real-btn').forEach(b=>b.disabled=true);
+  updateStats();
+  seqTimer=setTimeout(()=>{current++;showQuestion();},1000);
+}
+
 function updateStats() {
+  const isReal = mode==='real';
+  const startIdx = isReal ? 3 : parseInt(mode);
   let c=0,w=0,t=0;
-  for(let i=N;i<userAnswers.length;i++){
+  for(let i=startIdx;i<userAnswers.length;i++){
     if(userAnswers[i]===null){t++;continue;}
     if(userAnswers[i]===answers[i])c++;else w++;
   }
@@ -215,14 +357,17 @@ function updateStats() {
 }
 
 function showResult() {
-  gameActive=false; clearInterval(barTimer);
+  gameActive=false; clearInterval(barTimer); document.onkeydown=null;
+  const isReal = mode==='real';
+  const startIdx = isReal ? 3 : parseInt(mode);
   let c=0,w=0,t=0;
-  for(let i=N;i<userAnswers.length;i++){
+  for(let i=startIdx;i<userAnswers.length;i++){
     if(userAnswers[i]===null){t++;continue;}
     if(userAnswers[i]===answers[i])c++;else w++;
   }
   const tot=c+w+t, acc=tot>0?Math.round(c/tot*100):0;
   const msg=acc>=80?'훌륭해요! 실전 준비 됐어요 💪':acc>=60?'좋아요! 조금만 더 연습하면 돼요.':'계속 연습하면 금방 늘어요!';
+
   document.getElementById('nb-stage').innerHTML=`
     <div class="result-box">
       <h3>결과</h3>
@@ -234,6 +379,65 @@ function showResult() {
   `;
   document.getElementById('nb-cur').textContent=`${total} / ${total}`;
   document.getElementById('nb-acc').textContent=acc+'%';
+  showReview();
+}
+
+function showReview() {
+  const isReal = mode==='real';
+  const startIdx = isReal ? 3 : parseInt(mode);
+
+  let cardsHTML = '';
+  for (let i=0; i<total; i++) {
+    const shape=seq[i];
+    const isActive = i>=startIdx;
+    let boxClass='memory', statusLabel='기억중', statusClass='memory';
+
+    if (isActive) {
+      const ua=userAnswers[i];
+      if(ua===null)             { boxClass='timeout'; statusLabel='시간초과'; statusClass='timeout'; }
+      else if(ua===answers[i])  { boxClass='correct'; statusLabel='정답';    statusClass='correct'; }
+      else                      { boxClass='wrong';   statusLabel='오답';    statusClass='wrong'; }
+    }
+
+    let refHTML = '<div class="review-card-ref" style="color:transparent;">-</div>';
+    if (isActive && isReal) {
+      const two   = i>=2 ? seq[i-2].name : '-';
+      const three = i>=3 ? seq[i-3].name : '-';
+      const ans   = answers[i];
+      const ansLabel = ans==='none'?'다름':ans==='two'?`2전=${two}`:ans==='three'?`3전=${three}`:'?';
+      refHTML = `<div class="review-card-ref">2전:${two}<br>3전:${three}<br>정답:${ansLabel}</div>`;
+    } else if (isActive && !isReal) {
+      const N=parseInt(mode);
+      const ref=seq[i-N];
+      refHTML=`<div class="review-card-ref">${N}개전: ${ref.name}<br>${answers[i]?'→ 같음':'→ 다름'}</div>`;
+    }
+
+    cardsHTML+=`
+      <div class="review-card">
+        <div class="review-card-box ${boxClass}">
+          <div class="review-card-num">${i+1}</div>
+          ${shape.svg}
+        </div>
+        <div class="review-card-name">${shape.name}</div>
+        <div class="review-card-status ${statusClass}">${statusLabel}</div>
+        ${refHTML}
+      </div>
+    `;
+  }
+
+  document.getElementById('review-area').innerHTML=`
+    <div class="review-wrap">
+      <div class="review-title">전체 복기 — 도형 순서 확인</div>
+      <div class="review-legend">
+        <span><span class="legend-dot" style="background:#27ae60;"></span>정답</span>
+        <span><span class="legend-dot" style="background:#e74c3c;"></span>오답</span>
+        <span><span class="legend-dot" style="background:#e67e22;"></span>시간초과</span>
+        <span><span class="legend-dot" style="background:#ddd;"></span>기억 단계</span>
+      </div>
+      <div class="review-sequence">${cardsHTML}</div>
+    </div>
+  `;
+  document.getElementById('review-area').scrollIntoView({behavior:'smooth',block:'start'});
 }
 </script>
 </body>
