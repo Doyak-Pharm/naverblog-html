@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마법약 만들기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; color: #1a1a1a; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.25rem; text-align: center; line-height: 1.6; }
+
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+  .controls label { font-size: 13px; color: #666; }
+  .controls select { font-size: 13px; border: 1px solid #ccc; border-radius: 8px; padding: 5px 10px; background: #fff; }
+  .start-btn { padding: 0.6rem 2rem; border-radius: 24px; border: none; background: #3EC9A7; color: #fff; font-size: 15px; cursor: pointer; font-weight: 700; }
+  .start-btn:hover { background: #2eaf8f; }
+
+  .header { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+  .stat { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; padding: 0.5rem 0.9rem; font-size: 12px; color: #666; text-align: center; min-width: 80px; }
+  .stat span { font-size: 17px; font-weight: 700; color: #1a1a1a; display: block; }
+
+  .game-wrap { background: #fff; border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 16px rgba(0,0,0,0.08); width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+  .herb-card { border-radius: 14px; border: 2px solid #e8e8e8; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .herb-card.visible { background: #f0fae8; border-color: #c5e8a0; }
+  .herb-card.hidden  { background: #f0f0f0; border-color: #e0e0e0; }
+  .herb-emoji { font-size: 36px; }
+  .herb-name  { font-size: 11px; color: #666; font-weight: 500; }
+  .herb-hidden-icon { font-size: 32px; opacity: 0.2; }
+
+  .timerbar-wrap { width: 100%; height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+  .timerbar { height: 5px; border-radius: 3px; background: #3EC9A7; }
+
+  .answer-btns { display: flex; gap: 16px; width: 100%; }
+  .ans-btn { flex: 1; padding: 0.75rem; border-radius: 24px; border: 2px solid; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; background: #fff; }
+  .ans-btn.blue-btn { border-color: #3498db; color: #3498db; }
+  .ans-btn.blue-btn:hover:not(:disabled) { background: #3498db; color: #fff; }
+  .ans-btn.red-btn  { border-color: #e74c3c; color: #e74c3c; }
+  .ans-btn.red-btn:hover:not(:disabled)  { background: #e74c3c; color: #fff; }
+  .ans-btn.selected-blue { background: #3498db; color: #fff; border-color: #3498db; }
+  .ans-btn.selected-red  { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+  .ans-btn:disabled { opacity: 0.5; cursor: default; }
+
+  .feedback-card { width: 100%; border-radius: 16px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+  .feedback-card.success { background: #f0faf4; }
+  .feedback-card.fail    { background: #fffbe6; }
+  .feedback-icon  { font-size: 44px; }
+  .feedback-title { font-size: 17px; font-weight: 700; }
+  .feedback-title.success { color: #27ae60; }
+  .feedback-title.fail    { color: #e6a800; }
+  .feedback-desc  { font-size: 13px; color: #555; font-weight: 500; }
+
+  /* 조합별 관찰 기록 */
+  .memory-wrap { width: 100%; background: #f8f8f8; border-radius: 12px; padding: 10px 14px; }
+  .memory-title { font-size: 11px; color: #aaa; margin-bottom: 6px; font-weight: 600; }
+  .memory-list  { display: flex; flex-wrap: wrap; gap: 6px; }
+  .memory-tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; cursor: default; border: 1px solid #ddd; background: #fff; color: #555; }
+  .memory-tag.lean-blue { background: #eaf3fb; color: #1a6aab; border-color: #aed6f1; }
+  .memory-tag.lean-red  { background: #fde8e8; color: #c0392b; border-color: #f5b7b1; }
+  .memory-tag.current   { outline: 2px solid #333; outline-offset: 1px; }
+
+  .combo-badge { font-size: 11px; background: #f0f0f0; border-radius: 20px; padding: 2px 10px; color: #888; }
+
+  .result-box { text-align: center; width: 100%; }
+  .result-score { font-size: 48px; font-weight: 800; margin: 0.4rem 0; }
+  .result-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 0.5rem 0; }
+  .result-table th { background: #f5f5f5; padding: 5px 6px; font-weight: 600; }
+  .result-table td { padding: 5px 6px; border-top: 1px solid #f0f0f0; text-align: center; }
+
+  .phase-label { font-size: 15px; font-weight: 700; color: #333; text-align: center; }
+  .phase-sub   { font-size: 12px; color: #888; text-align: center; }
+  .intro-txt   { font-size: 13px; color: #888; text-align: center; line-height: 1.9; padding: 1rem 0; }
+</style>
+</head>
+<body>
+
+<h1>🧪 마법약 만들기</h1>
+<p class="subtitle">약초 조합마다 파란약/빨간약 확률이 숨겨져 있어요<br>반복 경험으로 확률을 파악하는 게 핵심!</p>
+
+<div class="controls">
+  <label>문항 수</label>
+  <select id="total-q">
+    <option value="40" selected>40문항</option>
+    <option value="50">50문항</option>
+    <option value="60">60문항</option>
+  </select>
+  <button class="start-btn" onclick="startGame()">시작</button>
+</div>
+
+<div class="header">
+  <div class="stat">문항 <span id="st-q">-</span></div>
+  <div class="stat">정답 <span id="st-cor">-</span></div>
+  <div class="stat">오답 <span id="st-wr">-</span></div>
+  <div class="stat">정답률 <span id="st-acc">-</span></div>
+</div>
+
+<div class="game-wrap" id="game-wrap">
+  <div class="intro-txt">
+    🌿 4가지 약초 조합을 보고<br>
+    파란약 또는 빨간약 중 선택하세요<br><br>
+    같은 조합이라도 매번 색이 다를 수 있어요<br>
+    <b>반복 경험으로 확률 패턴을 파악하세요!</b><br>
+    <span style="font-size:12px;">처음엔 무조건 파란약이 유리한 전략이에요</span>
+  </div>
+  <button class="start-btn" onclick="startGame()">시작하기</button>
+</div>
+
+<script>
+const HERB_POOL = [
+  { e: '🪷', n: '연꽃' },   { e: '🌿', n: '민트잎' },
+  { e: '🌾', n: '밀싹' },   { e: '🌵', n: '선인장' },
+  { e: '🍀', n: '클로버' }, { e: '🍃', n: '넓은잎' },
+  { e: '🌱', n: '새싹' },   { e: '🎋', n: '대나무' },
+  { e: '🍂', n: '단풍잎' }, { e: '🌸', n: '꽃잎' },
+  { e: '🌻', n: '해바라기' },{ e: '🍄', n: '버섯' },
+];
+
+// 14가지 조합: 슬롯 위치 기반 직관적 순서
+// 1개 보임(4가지) → 2개 보임(6가지) → 3개 보임(4가지)
+const COMBOS = [
+  [1,0,0,0], // 1번: 1번 슬롯만
+  [0,1,0,0], // 2번: 2번 슬롯만
+  [0,0,1,0], // 3번: 3번 슬롯만
+  [0,0,0,1], // 4번: 4번 슬롯만
+  [1,1,0,0], // 5번: 1+2번
+  [1,0,1,0], // 6번: 1+3번
+  [1,0,0,1], // 7번: 1+4번
+  [0,1,1,0], // 8번: 2+3번
+  [0,1,0,1], // 9번: 2+4번
+  [0,0,1,1], // 10번: 3+4번
+  [1,1,1,0], // 11번: 1+2+3번
+  [1,1,0,1], // 12번: 1+2+4번
+  [1,0,1,1], // 13번: 1+3+4번
+  [0,1,1,1], // 14번: 2+3+4번
+];
+
+let herbs = [];
+// 각 조합의 파란약 확률 (0.2~0.8 사이 랜덤) - 매 게임 새로 세팅
+let comboProbBlue = [];
+
+// 유저의 관찰 기록: comboIdx -> { blue: 파란 횟수, red: 빨간 횟수 }
+let observed = {};
+
+let totalQ, currentQ=0, correct=0, wrong=0;
+let barTimer=null;
+let questionQueue=[];
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+
+function startGame() {
+  totalQ = parseInt(document.getElementById('total-q').value);
+  currentQ=0; correct=0; wrong=0; observed={};
+
+  // 약초 4종 랜덤 선택
+  const pool = [...HERB_POOL]; shuffle(pool);
+  herbs = pool.slice(0, 4);
+
+  // 14가지 조합별 파란약 확률 새로 세팅 (0.2~0.8)
+  comboProbBlue = COMBOS.map(() => 0.2 + Math.random() * 0.6);
+
+  // 문항 큐: 14가지 조합 반복 셔플
+  questionQueue = [];
+  while(questionQueue.length < totalQ) {
+    const idx = Array.from({length:14},(_,i)=>i);
+    shuffle(idx);
+    questionQueue.push(...idx);
+  }
+  questionQueue = questionQueue.slice(0, totalQ);
+
+  updateStats();
+  nextQuestion();
+}
+
+function nextQuestion() {
+  clearTimers();
+  if(currentQ >= totalQ) { showResult(); return; }
+
+  const comboIdx = questionQueue[currentQ];
+  const bits     = COMBOS[comboIdx];
+  // 이번 문항의 정답: 확률에 따라 매번 새로 결정
+  const isBlue   = Math.random() < comboProbBlue[comboIdx];
+  currentQ++;
+  updateStats();
+
+  renderQuestion(comboIdx, bits, isBlue);
+}
+
+function renderQuestion(comboIdx, bits, isBlue) {
+  const cardsHTML = bits.map((v, i) => v
+    ? `<div class="herb-card visible"><div class="herb-emoji">${herbs[i].e}</div><div class="herb-name">${herbs[i].n}</div></div>`
+    : `<div class="herb-card hidden"><div class="herb-hidden-icon">🌿</div></div>`
+  ).join('');
+
+  // 관찰 기록으로 각 조합 경향 표시
+  const obsKeys = Object.keys(observed).map(Number).sort((a,b)=>a-b);
+  const memHTML = obsKeys.length > 0 ? `
+    <div class="memory-wrap">
+      <div class="memory-title">📊 관찰 기록 (${obsKeys.length}/14개 조합)</div>
+      <div class="memory-list">
+        ${obsKeys.map(k => {
+          const o = observed[k];
+          const total = o.blue + o.red;
+          const bluePct = Math.round(o.blue / total * 100);
+          const leanClass = bluePct >= 60 ? 'lean-blue' : bluePct <= 40 ? 'lean-red' : '';
+          const isCurrent = k === comboIdx;
+          return `<div class="memory-tag ${leanClass}${isCurrent?' current':''}" title="조합${k+1}: 파란${o.blue}번 빨간${o.red}번">
+            ${k+1}번 🔵${o.blue}/🔴${o.red}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  document.getElementById('game-wrap').innerHTML = `
+    <div class="phase-label">🧪 어떤 마법약이 만들어질까요?</div>
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <div class="phase-sub">확률 패턴을 파악해 예측하세요</div>
+      <div class="combo-badge">조합 ${comboIdx+1}번 | ${currentQ}/${totalQ}</div>
+    </div>
+    <div class="card-grid">${cardsHTML}</div>
+    <div class="timerbar-wrap"><div class="timerbar" id="tbar" style="width:100%;"></div></div>
+    <div class="answer-btns">
+      <button class="ans-btn blue-btn" id="btn-blue" onclick="selectAnswer(true,${comboIdx},${isBlue})">파란약</button>
+      <button class="ans-btn red-btn"  id="btn-red"  onclick="selectAnswer(false,${comboIdx},${isBlue})">빨간약</button>
+    </div>
+    ${memHTML}
+  `;
+
+  startBar(3000, () => autoSelect(comboIdx, isBlue), '#3EC9A7');
+}
+
+function selectAnswer(userBlue, comboIdx, isBlue) {
+  clearTimers();
+  const isCorrect = userBlue === isBlue;
+
+  document.getElementById('btn-blue').disabled = true;
+  document.getElementById('btn-red').disabled  = true;
+  if(userBlue) document.getElementById('btn-blue').classList.add('selected-blue');
+  else         document.getElementById('btn-red').classList.add('selected-red');
+
+  // 관찰 기록 업데이트
+  if(!observed[comboIdx]) observed[comboIdx] = { blue:0, red:0 };
+  isBlue ? observed[comboIdx].blue++ : observed[comboIdx].red++;
+
+  if(isCorrect) correct++; else wrong++;
+  updateStats();
+  showFeedback(isCorrect, isBlue, false);
+}
+
+function autoSelect(comboIdx, isBlue) {
+  wrong++;
+  if(!observed[comboIdx]) observed[comboIdx] = { blue:0, red:0 };
+  isBlue ? observed[comboIdx].blue++ : observed[comboIdx].red++;
+  updateStats();
+  showFeedback(false, isBlue, true);
+}
+
+function showFeedback(isCorrect, isBlue, timeout) {
+  const label = isBlue ? '파란약' : '빨간약';
+  const icon  = isBlue ? '🔵' : '🔴';
+  const div = document.createElement('div');
+  div.className = `feedback-card ${isCorrect?'success':'fail'}`;
+  div.innerHTML = `
+    <div class="feedback-icon">${icon}</div>
+    <div class="feedback-title ${isCorrect?'success':'fail'}">${timeout?'시간 초과':isCorrect?'예측 성공':'예측 실패'}</div>
+    <div class="feedback-desc">${label}이 제조되었습니다.</div>
+  `;
+  document.getElementById('game-wrap').appendChild(div);
+  setTimeout(() => nextQuestion(), 1200);
+}
+
+function startBar(duration, cb, color) {
+  const b = document.getElementById('tbar');
+  if(b){ b.style.transition='none'; b.style.width='100%'; b.style.background=color; }
+  let elapsed=0;
+  barTimer=setInterval(()=>{
+    elapsed+=50;
+    const pct=Math.max(0,100-(elapsed/duration*100));
+    const bar=document.getElementById('tbar');
+    if(bar){ bar.style.width=pct+'%'; bar.style.background=pct<25?'#e74c3c':color; }
+    if(elapsed>=duration){ clearInterval(barTimer); cb(); }
+  },50);
+}
+
+function clearTimers(){ clearInterval(barTimer); }
+
+function updateStats(){
+  const tot=correct+wrong, acc=tot>0?Math.round(correct/tot*100):'-';
+  document.getElementById('st-q').textContent   = currentQ>0?`${currentQ}/${totalQ}`:'-';
+  document.getElementById('st-cor').textContent = correct||'-';
+  document.getElementById('st-wr').textContent  = wrong||'-';
+  document.getElementById('st-acc').textContent = acc==='-'?'-':acc+'%';
+}
+
+function showResult(){
+  const tot=correct+wrong, acc=tot>0?Math.round(correct/tot*100):0;
+  const msg=acc>=80?'훌륭해요! 확률 파악 능력 최고예요 💪':acc>=60?'좋아요! 조금만 더 관찰하면 돼요.':'계속 연습하면 금방 늘어요!';
+
+  // 실제 확률 공개
+  const probRows = COMBOS.map((bits,i)=>{
+    const prob = Math.round(comboProbBlue[i]*100);
+    const obs  = observed[i];
+    const obsStr = obs ? `🔵${obs.blue}/🔴${obs.red}` : '-';
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${bits.map((b,j)=>b?herbs[j].e:'⬜').join(' ')}</td>
+      <td style="color:#3498db;font-weight:700;">${prob}%</td>
+      <td>${obsStr}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('game-wrap').innerHTML=`
+    <div class="result-box">
+      <div style="font-size:36px;">🧪</div>
+      <div style="font-size:14px;font-weight:700;margin:4px 0;">최종 결과</div>
+      <div class="result-score" style="color:${acc>=60?'#27ae60':'#e74c3c'};">${acc}%</div>
+      <table class="result-table">
+        <tr><th>총 문항</th><th>정답</th><th>오답</th></tr>
+        <tr><td>${tot}</td><td>${correct}</td><td>${wrong}</td></tr>
+      </table>
+      <div style="font-size:13px;color:#333;margin-bottom:0.75rem;">${msg}</div>
+      <details style="width:100%;margin-bottom:1rem;">
+        <summary style="font-size:12px;color:#888;cursor:pointer;text-align:center;">14가지 조합 실제 확률 공개 👀</summary>
+        <table class="result-table" style="margin-top:6px;">
+          <tr><th>번호</th><th>조합</th><th>파란약 확률</th><th>내 관찰</th></tr>
+          ${probRows}
+        </table>
+      </details>
+      <button class="start-btn" onclick="startGame()">다시 하기</button>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
