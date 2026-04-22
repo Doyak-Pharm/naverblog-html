@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고양이 술래잡기 연습</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f0f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; color: #1a1a1a; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.25rem; text-align: center; }
+
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+  .controls label { font-size: 13px; color: #666; }
+  .controls select { font-size: 13px; border: 1px solid #ccc; border-radius: 8px; padding: 5px 10px; background: #fff; }
+  .start-btn { padding: 0.6rem 2rem; border-radius: 10px; border: none; background: #3EC9A7; color: #fff; font-size: 15px; cursor: pointer; font-weight: 600; }
+  .start-btn:hover { background: #2eaf8f; }
+
+  .header { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+  .stat { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; padding: 0.5rem 0.9rem; font-size: 12px; color: #666; text-align: center; min-width: 72px; }
+  .stat span { font-size: 17px; font-weight: 700; color: #1a1a1a; display: block; }
+
+  /* 게임 전체 컨테이너 */
+  .game-wrap {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* 상단 정보 - 고정 높이 */
+  .top-area {
+    width: 100%;
+    height: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .phase-label { font-size: 15px; font-weight: 700; color: #333; text-align: center; }
+  .phase-sub   { font-size: 12px; color: #888; text-align: center; }
+  .count-badge { font-size: 11px; background: #f0f0f0; border-radius: 20px; padding: 2px 10px; color: #666; }
+
+  /* 격자 컨테이너 - 항상 같은 공간 차지, visibility로 숨김 */
+  .grid-area {
+    width: 360px;
+    height: 360px;
+    flex-shrink: 0;
+  }
+  .grid-area.hidden { visibility: hidden; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 58px);
+    grid-template-rows: repeat(6, 58px);
+    gap: 4px;
+    width: 360px;
+    height: 360px;
+  }
+  .cell {
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    border: 1.5px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .cell.mouse-cell { background: #fff; border-color: #bbb; }
+  .cell.cat-red    { background: #e74c3c; border-color: #c0392b; }
+  .cell.cat-blue   { background: #3498db; border-color: #2176ae; }
+  .cell.cat-normal { background: #f5f5f5; border-color: #ccc; }
+
+  /* 타이머바 */
+  .bar-area { width: 100%; padding: 8px 0 6px; flex-shrink: 0; }
+  .timerbar-wrap { width: 100%; height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+  .timerbar { height: 5px; border-radius: 3px; }
+
+  /* 하단 응답 영역 - 고정 높이 */
+  .bottom-area {
+    width: 100%;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* 확신도 */
+  .conf-wrap { width: 100%; }
+  .conf-arrows { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #555; margin-bottom: 6px; }
+  .conf-scale { display: flex; justify-content: space-between; align-items: flex-start; }
+  .conf-divider { width: 1px; background: #ddd; height: 34px; flex-shrink: 0; align-self: center; }
+  .conf-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; flex: 1; }
+  .conf-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ddd; background: #f5f5f5; transition: all 0.12s; margin: 0 auto; }
+  .conf-item:hover .conf-circle { border-color: #3EC9A7; background: #eafaf5; transform: scale(1.1); }
+  .conf-item.sel-miss  .conf-circle { background: #e74c3c; border-color: #c0392b; transform: scale(1.15); }
+  .conf-item.sel-found .conf-circle { background: #3498db; border-color: #2176ae; transform: scale(1.15); }
+  .conf-text { font-size: 9px; color: #888; text-align: center; line-height: 1.3; white-space: pre-line; }
+  .score-guide { font-size: 10px; color: #bbb; text-align: center; }
+  .waiting-msg { font-size: 13px; color: #bbb; }
+  .cat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+
+  /* 결과 */
+  .result-box { text-align: center; padding: 0.5rem 0; }
+  .result-score-big { font-size: 48px; font-weight: 800; margin: 0.4rem 0; }
+  .result-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 0.5rem 0; }
+  .result-table th { background: #f5f5f5; padding: 5px 6px; font-weight: 600; }
+  .result-table td { padding: 5px 6px; border-top: 1px solid #f0f0f0; text-align: center; }
+
+  .intro-txt { color: #888; font-size: 13px; text-align: center; line-height: 1.9; }
+</style>
+</head>
+<body>
+
+<h1>🐱 고양이 술래잡기</h1>
+<p class="subtitle">생쥐 위치를 기억하고, 고양이가 생쥐를 잡았는지 판단하세요</p>
+
+<div class="controls">
+  <label>라운드 수</label>
+  <select id="rounds">
+    <option value="5">5라운드</option>
+    <option value="10" selected>10라운드</option>
+    <option value="20">20라운드</option>
+  </select>
+  <button class="start-btn" onclick="startGame()">시작</button>
+</div>
+
+<div class="header">
+  <div class="stat">라운드 <span id="st-round">-</span></div>
+  <div class="stat">이번 마리 <span id="st-count">-</span></div>
+  <div class="stat">총점 <span id="st-score">-</span></div>
+  <div class="stat">정답률 <span id="st-acc">-</span></div>
+</div>
+
+<div class="game-wrap">
+  <div class="top-area" id="top-area">
+    <div class="intro-txt">
+      🐭 생쥐 위치를 1초간 기억<br>
+      🐱 고양이 등장 후 빨간/파란 고양이가<br>생쥐를 잡았는지 3초 안에 판단<br>
+      <b>확신할수록 정답 시 고득점 / 오답 시 감점</b>
+    </div>
+  </div>
+
+  <div class="grid-area hidden" id="grid-area">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="bar-area">
+    <div class="timerbar-wrap">
+      <div class="timerbar" id="tbar" style="width:0%;background:#3EC9A7;"></div>
+    </div>
+  </div>
+
+  <div class="bottom-area" id="bottom-area">
+    <button class="start-btn" onclick="startGame()">시작하기</button>
+  </div>
+</div>
+
+<script>
+const GRID = 6;
+const MOUSE = '🐭', CAT = '🐱';
+
+const SCORE_TABLE = [
+  { correct: 1, wrong: -1 },
+  { correct: 2, wrong: -2 },
+  { correct: 3, wrong: -3 },
+  { correct: 4, wrong: -4 },
+];
+
+function getScoreDelta(val, caught) {
+  const level = parseInt(val.slice(-1));
+  const side  = val.startsWith('miss') ? 'miss' : 'found';
+  const isCorrect = (side === 'found') === caught;
+  return isCorrect ? SCORE_TABLE[level-1].correct : SCORE_TABLE[level-1].wrong;
+}
+
+let totalRounds, currentRound=0;
+let mousePos=[], catPos=[], redIdx=-1, blueIdx=-1;
+let countSequence=[];
+let totalScore=0, totalQ=0, correctQ=0;
+let barTimer=null;
+let roundAnswers={};
+let currentCount=0;
+
+function makeCountSequence(n) {
+  const pool = [];
+  for(let i=4; i<=24; i++) pool.push(i);
+  shuffle(pool);
+  const result = [];
+  for(let i=0; i<n; i++) result.push(pool[i % pool.length]);
+  return result;
+}
+
+function startGame() {
+  totalRounds = parseInt(document.getElementById('rounds').value);
+  currentRound=0; totalScore=0; totalQ=0; correctQ=0;
+  countSequence = makeCountSequence(totalRounds);
+  updateStats();
+  nextRound();
+}
+
+function nextRound() {
+  clearTimers();
+  if(currentRound >= totalRounds) { showFinalResult(); return; }
+  roundAnswers = {};
+  currentCount = countSequence[currentRound];
+  currentRound++;
+  updateStats();
+
+  mousePos = randomCells(currentCount, GRID*GRID);
+  catPos   = randomCells(currentCount, GRID*GRID);
+  redIdx   = Math.floor(Math.random()*currentCount);
+  do { blueIdx = Math.floor(Math.random()*currentCount); } while(blueIdx===redIdx && currentCount>1);
+
+  showMousePhase();
+}
+
+function showMousePhase() {
+  setTop(`
+    <div class="phase-label">🐭 생쥐들이 숨습니다</div>
+    <div class="phase-sub">위치를 기억하세요! (1초)</div>
+    <div class="count-badge">이번 라운드: ${currentCount}마리 &nbsp;|&nbsp; ${currentRound}/${totalRounds}</div>
+  `);
+  showGrid(true);
+  renderGrid(mousePos, [], -1, -1);
+  setBottom(`<div class="waiting-msg">위치를 기억하세요...</div>`);
+  startBar(1000, () => showCatPhase(), '#3EC9A7');
+}
+
+function showCatPhase() {
+  setTop(`
+    <div class="phase-label">🐱 고양이들이 찾습니다</div>
+    <div class="phase-sub">빨간/파란 고양이 위치를 기억하세요!</div>
+    <div class="count-badge">${currentRound}/${totalRounds}</div>
+  `);
+  showGrid(true);
+  // 처음 0.5초: 빨간/파란 표시 없이 일반 고양이로만 표시
+  renderGrid([], catPos, -1, -1);
+  setBottom(`<div class="waiting-msg">고양이 위치를 기억하세요...</div>`);
+  startBar(2000, () => askQuestion('red'), '#f0a500');
+  // 0.5초 후 빨간/파란 표시
+  setTimeout(() => {
+    renderGrid([], catPos, redIdx, blueIdx);
+  }, 500);
+}
+
+function askQuestion(catColor) {
+  const catIdx  = catColor === 'red' ? redIdx : blueIdx;
+  const catCell = catPos[catIdx];
+  const caught  = mousePos.includes(catCell);
+  roundAnswers[catColor + '_answer'] = caught;
+
+  const colorLabel = catColor === 'red' ? '빨간' : '파란';
+  const colorHex   = catColor === 'red' ? '#e74c3c' : '#3498db';
+
+  setTop(`
+    <div class="phase-label" style="color:${colorHex};">${colorLabel} 칸의 고양이는 생쥐를 찾았을까요?</div>
+    <div class="phase-sub">확신하는 만큼 표시해 주세요 (3초)</div>
+    <div class="count-badge">${currentRound}/${totalRounds}</div>
+  `);
+
+  // 질문 단계에서는 격자 숨김
+  showGrid(false);
+
+  setBottom(`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div class="cat-icon" style="background:${colorHex};">${CAT}</div>
+      <div style="font-size:12px;color:#666;line-height:1.6;">이 고양이가 생쥐를 잡았나요?<br><span style="font-size:11px;color:#aaa;">정답 방향으로 확신하는 만큼 선택</span></div>
+    </div>
+    ${buildConfScale(catColor)}
+    <div class="score-guide">정답+확신↑ → 최대+4점 &nbsp;|&nbsp; 오답+확신↑ → 최대-4점</div>
+  `);
+
+  startBar(3000, () => processAnswer(catColor, 'timeout'), '#e74c3c');
+}
+
+function buildConfScale(catColor) {
+  const labels = ['매우\n확실','확실','조금\n확실','불확실','불확실','조금\n확실','확실','매우\n확실'];
+  const vals   = ['miss4','miss3','miss2','miss1','found1','found2','found3','found4'];
+  let html = `<div class="conf-wrap">
+    <div class="conf-arrows"><span>← 놓쳤다</span><span>찾았다 →</span></div>
+    <div class="conf-scale">`;
+  for(let i=0; i<8; i++){
+    if(i===4) html += `<div class="conf-divider"></div>`;
+    const side = i < 4 ? 'miss' : 'found';
+    html += `<div class="conf-item" id="ci-${vals[i]}" onclick="selectConf('${catColor}','${vals[i]}','${side}')">
+      <div class="conf-circle"></div>
+      <div class="conf-text">${labels[i]}</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+function selectConf(catColor, val, side) {
+  clearTimers();
+  document.querySelectorAll('.conf-item').forEach(el => el.classList.remove('sel-miss','sel-found'));
+  const el = document.getElementById('ci-' + val);
+  if(el) el.classList.add('sel-' + side);
+  setTimeout(() => processAnswer(catColor, val), 400);
+}
+
+function processAnswer(catColor, val) {
+  clearTimers();
+  const caught = roundAnswers[catColor + '_answer'];
+  totalQ++;
+
+  if(val !== 'timeout') {
+    const delta = getScoreDelta(val, caught);
+    const side  = val.startsWith('miss') ? 'miss' : 'found';
+    if((side === 'found') === caught) correctQ++;
+    totalScore += delta;
+  }
+  updateStats();
+
+  if(catColor === 'red') setTimeout(() => askQuestion('blue'), 500);
+  else                   setTimeout(() => nextRound(), 500);
+}
+
+// ── 유틸 ────────────────────────────────────
+
+function setTop(html) {
+  document.getElementById('top-area').innerHTML = html;
+}
+function setBottom(html) {
+  document.getElementById('bottom-area').innerHTML = html;
+}
+function showGrid(visible) {
+  const el = document.getElementById('grid-area');
+  if(visible) el.classList.remove('hidden');
+  else        el.classList.add('hidden');
+}
+function renderGrid(mPos, cPos, rIdx, bIdx) {
+  let html = '';
+  for(let i=0; i<GRID*GRID; i++){
+    const isMouse = mPos.includes(i);
+    const catIdx  = cPos.indexOf(i);
+    let cls = 'cell', emoji = '';
+    if(isMouse) { cls += ' mouse-cell'; emoji = MOUSE; }
+    if(catIdx >= 0) {
+      emoji = CAT;
+      if(catIdx === rIdx)       cls += ' cat-red';
+      else if(catIdx === bIdx)  cls += ' cat-blue';
+      else                      cls += ' cat-normal';
+    }
+    html += `<div class="${cls}">${emoji}</div>`;
+  }
+  document.getElementById('grid').innerHTML = html;
+}
+
+function startBar(duration, cb, color) {
+  const b = document.getElementById('tbar');
+  if(b) { b.style.transition='none'; b.style.width='100%'; b.style.background=color; }
+  setTimeout(() => {
+    const bar = document.getElementById('tbar');
+    if(bar) bar.style.transition = `width ${duration}ms linear`;
+  }, 30);
+
+  let elapsed = 0;
+  barTimer = setInterval(() => {
+    elapsed += 50;
+    const pct = Math.max(0, 100 - (elapsed / duration * 100));
+    const bar = document.getElementById('tbar');
+    if(bar) {
+      bar.style.width = pct + '%';
+      if(pct < 25) bar.style.background = '#e74c3c';
+    }
+    if(elapsed >= duration) { clearInterval(barTimer); cb(); }
+  }, 50);
+}
+
+function clearTimers() { clearInterval(barTimer); }
+
+function updateStats() {
+  const acc = totalQ > 0 ? Math.round(correctQ / totalQ * 100) : '-';
+  document.getElementById('st-round').textContent = currentRound > 0 ? `${currentRound}/${totalRounds}` : '-';
+  document.getElementById('st-count').textContent = currentRound > 0 ? currentCount + '마리' : '-';
+  document.getElementById('st-score').textContent = totalQ > 0 ? totalScore : '-';
+  document.getElementById('st-acc').textContent   = acc === '-' ? '-' : acc + '%';
+}
+
+function showFinalResult() {
+  const maxScore = totalQ * 4;
+  const pct = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+  const msg = pct >= 70 ? '훌륭해요! 실전 준비 됐어요 💪' : pct >= 40 ? '좋아요! 조금만 더 연습하면 돼요.' : '계속 연습하면 금방 늘어요!';
+
+  setTop('');
+  showGrid(false);
+  document.getElementById('tbar').style.width = '0%';
+  setBottom(`
+    <div class="result-box">
+      <div style="font-size:32px;">🐱</div>
+      <div style="font-size:14px;font-weight:700;margin:4px 0;">최종 결과</div>
+      <div class="result-score-big" style="color:${totalScore >= 0 ? '#27ae60' : '#e74c3c'};">${totalScore}점</div>
+      <table class="result-table">
+        <tr><th>총 문항</th><th>정답</th><th>정답률</th><th>최고점</th><th>달성률</th></tr>
+        <tr>
+          <td>${totalQ}</td>
+          <td>${correctQ}</td>
+          <td>${totalQ > 0 ? Math.round(correctQ/totalQ*100) : 0}%</td>
+          <td>${maxScore}</td>
+          <td>${pct}%</td>
+        </tr>
+      </table>
+      <div style="font-size:13px;color:#333;margin-bottom:1rem;">${msg}</div>
+      <button class="start-btn" onclick="startGame()">다시 하기</button>
+    </div>
+  `);
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+function randomCells(n, total) {
+  const all = Array.from({length:total}, (_,i) => i);
+  shuffle(all);
+  return all.slice(0, n);
+}
+</script>
+</body>
+</html>
