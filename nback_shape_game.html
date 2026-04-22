@@ -23,8 +23,6 @@
   .timer-txt.urgent { color: #c0392b; }
   .timerbar-wrap { width: 180px; height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
   .timerbar { height: 5px; background: #3498db; border-radius: 3px; transition: width 0.1s linear, background 0.3s; }
-
-  /* 일반 모드 버튼 */
   .btns { display: flex; gap: 16px; }
   .btn { padding: 0.7rem 2.5rem; border-radius: 10px; border: 1.5px solid #ccc; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; font-weight: 500; transition: background 0.1s, transform 0.1s; }
   .btn:hover:not(:disabled) { background: #f5f5f5; }
@@ -33,8 +31,6 @@
   .btn.same:hover:not(:disabled) { background: #eaf3fb; }
   .btn.diff { border-color: #999; color: #555; }
   .btn:disabled { opacity: 0.35; cursor: default; }
-
-  /* 실전 모드 버튼 */
   .real-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
   .real-btn { display: flex; align-items: center; gap: 14px; padding: 0.75rem 1.25rem; border-radius: 10px; border: 1.5px solid #ccc; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; font-weight: 500; transition: background 0.1s, transform 0.1s; text-align: left; }
   .real-btn:hover:not(:disabled) { background: #f5f5f5; }
@@ -46,7 +42,6 @@
   .real-btn.three-btn { border-color: #8e44ad; color: #6c3483; }
   .real-btn.three-btn:hover:not(:disabled) { background: #f5eef8; }
   .key-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 60px; padding: 3px 8px; border-radius: 6px; border: 1px solid #ccc; background: #f5f5f5; font-size: 12px; font-weight: 600; color: #444; flex-shrink: 0; }
-
   .feedback { font-size: 14px; font-weight: 600; min-height: 22px; }
   .feedback.correct { color: #27ae60; }
   .feedback.wrong { color: #c0392b; }
@@ -63,14 +58,14 @@
   .result-score { font-size: 48px; font-weight: 700; margin: 0.5rem 0; }
   .result-detail { font-size: 13px; color: #888; margin-bottom: 0.75rem; }
   .result-msg { font-size: 14px; color: #333; margin-bottom: 1rem; }
-  .intro { color: #888; font-size: 14px; padding: 3rem 0; }
-  .tip { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.75rem 1rem; font-size: 13px; color: #555; max-width: 400px; text-align: center; line-height: 1.6; }
+  .intro { color: #888; font-size: 14px; padding: 3rem 0; text-align: center; }
+  .tip { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.75rem 1rem; font-size: 13px; color: #555; max-width: 420px; text-align: center; line-height: 1.6; }
   .tip strong { color: #3498db; }
-  .mode-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.5rem; }
-  .mode-badge.real { background: #fef6ed; color: #e67e22; border: 1px solid #f0a500; }
-  .mode-badge.normal { background: #eaf3fb; color: #1a6aab; border: 1px solid #3498db; }
-
-  /* 복기 */
+  .mode-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.25rem; }
+  .mode-badge.real-easy   { background: #eafaf1; color: #1e8449; border: 1px solid #27ae60; }
+  .mode-badge.real-mid    { background: #fef9e7; color: #b7770d; border: 1px solid #f0a500; }
+  .mode-badge.real-hard   { background: #fdf2f8; color: #884ea0; border: 1px solid #8e44ad; }
+  .mode-badge.normal      { background: #eaf3fb; color: #1a6aab; border: 1px solid #3498db; }
   .review-wrap { width: 100%; max-width: 680px; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0; }
   .review-title { font-size: 15px; font-weight: 600; margin-bottom: 0.75rem; text-align: center; }
   .review-legend { display: flex; gap: 14px; justify-content: center; margin-bottom: 1.25rem; font-size: 12px; color: #666; flex-wrap: wrap; }
@@ -81,16 +76,16 @@
   .review-card-box { width: 68px; height: 68px; border-radius: 10px; border: 2px solid #e0e0e0; background: #fff; display: flex; align-items: center; justify-content: center; position: relative; }
   .review-card-box svg { width: 42px; height: 42px; }
   .review-card-box.correct { border-color: #27ae60; background: #f0faf4; }
-  .review-card-box.wrong { border-color: #e74c3c; background: #fdf0f0; }
+  .review-card-box.wrong   { border-color: #e74c3c; background: #fdf0f0; }
   .review-card-box.timeout { border-color: #e67e22; background: #fef6ed; }
-  .review-card-box.memory { border-color: #ddd; background: #fafafa; }
+  .review-card-box.memory  { border-color: #ddd;    background: #fafafa; }
   .review-card-num { position: absolute; top: 2px; left: 5px; font-size: 10px; font-weight: 600; color: #aaa; }
-  .review-card-name { font-size: 11px; color: #666; text-align: center; }
+  .review-card-name   { font-size: 11px; color: #666; text-align: center; }
   .review-card-status { font-size: 10px; font-weight: 600; text-align: center; }
   .review-card-status.correct { color: #27ae60; }
-  .review-card-status.wrong { color: #e74c3c; }
+  .review-card-status.wrong   { color: #e74c3c; }
   .review-card-status.timeout { color: #e67e22; }
-  .review-card-status.memory { color: #bbb; }
+  .review-card-status.memory  { color: #bbb; }
   .review-card-ref { font-size: 10px; color: #aaa; text-align: center; line-height: 1.4; }
 </style>
 </head>
@@ -100,10 +95,12 @@
 
 <div class="controls">
   <label>모드</label>
-  <select id="nb-mode" onchange="onModeChange()">
+  <select id="nb-mode">
     <option value="2">2-back</option>
     <option value="3">3-back</option>
-    <option value="real">실전 (2+3 동시)</option>
+    <option value="easy">실전 — 하 (다름 50%)</option>
+    <option value="mid">실전 — 중 (다름 35%)</option>
+    <option value="hard">실전 — 상 (다름 15%)</option>
   </select>
   <label>문항 수</label>
   <select id="nb-total">
@@ -123,67 +120,107 @@
 
 <div class="stage" id="nb-stage">
   <div class="intro">시작 버튼을 눌러 게임을 시작하세요.</div>
-  <div class="tip"><strong>팁:</strong> 도형이 나올 때마다 이름을 머릿속으로 중얼거리세요.<br>실전 모드: SPACE=다름, ←=2번째 전과 같음, →=3번째 전과 같음</div>
+  <div class="tip">
+    <strong>실전 모드 키보드:</strong> SPACE = 다름 &nbsp;|&nbsp; ← = 2번째 전과 같음 &nbsp;|&nbsp; → = 3번째 전과 같음<br>
+    <strong>팁:</strong> 도형 이름을 머릿속으로 중얼거리며 슬롯을 밀어가세요.
+  </div>
 </div>
 
 <div id="review-area"></div>
 
 <script>
 const SHAPES = [
-  { name: '세모',      svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,88 8,88" fill="#1AACAA"/></svg>' },
-  { name: '원',        svg: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="#1AACAA"/></svg>' },
-  { name: '사각형',   svg: '<svg viewBox="0 0 100 100"><rect x="12" y="12" width="76" height="76" fill="#1AACAA"/></svg>' },
-  { name: '사다리꼴', svg: '<svg viewBox="0 0 100 100"><polygon points="20,80 80,80 65,20 35,20" fill="#1AACAA"/></svg>' },
-  { name: '모래시계', svg: '<svg viewBox="0 0 100 100"><polygon points="10,10 90,10 50,50 90,90 10,90 50,50" fill="#1AACAA"/></svg>' },
+  { name: '세모',       svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,88 8,88" fill="#1AACAA"/></svg>' },
+  { name: '원',         svg: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="#1AACAA"/></svg>' },
+  { name: '사각형',    svg: '<svg viewBox="0 0 100 100"><rect x="12" y="12" width="76" height="76" fill="#1AACAA"/></svg>' },
+  { name: '사다리꼴',  svg: '<svg viewBox="0 0 100 100"><polygon points="20,80 80,80 65,20 35,20" fill="#1AACAA"/></svg>' },
+  { name: '모래시계',  svg: '<svg viewBox="0 0 100 100"><polygon points="10,10 90,10 50,50 90,90 10,90 50,50" fill="#1AACAA"/></svg>' },
   { name: '다이아몬드', svg: '<svg viewBox="0 0 100 100"><polygon points="50,5 85,35 50,95 15,35" fill="#1AACAA"/></svg>' },
-  { name: '마름모',   svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,50 50,92 8,50" fill="#1AACAA"/></svg>' },
+  { name: '마름모',    svg: '<svg viewBox="0 0 100 100"><polygon points="50,8 92,50 50,92 8,50" fill="#1AACAA"/></svg>' },
   { name: '나비넥타이', svg: '<svg viewBox="0 0 100 100"><polygon points="10,20 50,50 10,80" fill="#1AACAA"/><polygon points="90,20 50,50 90,80" fill="#1AACAA"/></svg>' },
-  { name: '별',        svg: '<svg viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#1AACAA"/></svg>' },
-  { name: '퍼즐',     svg: '<svg viewBox="0 0 100 100"><rect x="10" y="10" width="38" height="38" fill="#1AACAA"/><rect x="52" y="52" width="38" height="38" fill="#1AACAA"/><rect x="10" y="52" width="18" height="38" fill="#1AACAA"/><rect x="72" y="10" width="18" height="38" fill="#1AACAA"/></svg>' },
-  { name: '역나비',   svg: '<svg viewBox="0 0 100 100"><polygon points="15,15 85,15 50,55" fill="#1AACAA"/><polygon points="15,85 85,85 50,55" fill="#1AACAA"/></svg>' },
-  { name: '성모양',   svg: '<svg viewBox="0 0 100 100"><rect x="30" y="50" width="40" height="40" fill="#1AACAA"/><rect x="15" y="30" width="18" height="30" fill="#1AACAA"/><rect x="67" y="30" width="18" height="30" fill="#1AACAA"/><rect x="41" y="15" width="18" height="25" fill="#1AACAA"/></svg>' },
-  { name: '이중삼각', svg: '<svg viewBox="0 0 100 100"><polygon points="50,10 88,48 12,48" fill="#1AACAA"/><polygon points="50,52 88,90 12,90" fill="#1AACAA"/></svg>' },
-  { name: '엑스',     svg: '<svg viewBox="0 0 100 100"><polygon points="20,8 50,38 80,8 92,20 62,50 92,80 80,92 50,62 20,92 8,80 38,50 8,20" fill="#1AACAA"/></svg>' },
-  { name: '왕관',     svg: '<svg viewBox="0 0 100 100"><polygon points="10,85 10,40 28,60 50,15 72,60 90,40 90,85" fill="#1AACAA"/></svg>' },
+  { name: '별',         svg: '<svg viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#1AACAA"/></svg>' },
+  { name: '퍼즐',      svg: '<svg viewBox="0 0 100 100"><rect x="10" y="10" width="38" height="38" fill="#1AACAA"/><rect x="52" y="52" width="38" height="38" fill="#1AACAA"/><rect x="10" y="52" width="18" height="38" fill="#1AACAA"/><rect x="72" y="10" width="18" height="38" fill="#1AACAA"/></svg>' },
+  { name: '역나비',    svg: '<svg viewBox="0 0 100 100"><polygon points="15,15 85,15 50,55" fill="#1AACAA"/><polygon points="15,85 85,85 50,55" fill="#1AACAA"/></svg>' },
+  { name: '성모양',    svg: '<svg viewBox="0 0 100 100"><rect x="30" y="50" width="40" height="40" fill="#1AACAA"/><rect x="15" y="30" width="18" height="30" fill="#1AACAA"/><rect x="67" y="30" width="18" height="30" fill="#1AACAA"/><rect x="41" y="15" width="18" height="25" fill="#1AACAA"/></svg>' },
+  { name: '이중삼각',  svg: '<svg viewBox="0 0 100 100"><polygon points="50,10 88,48 12,48" fill="#1AACAA"/><polygon points="50,52 88,90 12,90" fill="#1AACAA"/></svg>' },
+  { name: '엑스',      svg: '<svg viewBox="0 0 100 100"><polygon points="20,8 50,38 80,8 92,20 62,50 92,80 80,92 50,62 20,92 8,80 38,50 8,20" fill="#1AACAA"/></svg>' },
+  { name: '왕관',      svg: '<svg viewBox="0 0 100 100"><polygon points="10,85 10,40 28,60 50,15 72,60 90,40 90,85" fill="#1AACAA"/></svg>' },
 ];
 
+// 난이도별 "다름(none)" 확률
+const NONE_PROB = { easy: 0.50, mid: 0.35, hard: 0.15 };
+
 const TIME_LIMIT = 3000;
-// seq: 도형 배열
-// answers: 일반모드=true/false, 실전모드='none'|'two'|'three'
-// userAnswers: 동일 형식
 let seq=[], answers=[], userAnswers=[], current=0, mode='2', total=20;
 let gameActive=false, answered=false, seqTimer=null, barTimer=null;
 
-function onModeChange() {
-  // 모드 바꿔도 별도 처리 없음
-}
+function isRealMode() { return ['easy','mid','hard'].includes(mode); }
 
-function getRealAnswer(i) {
-  // 실전: 3개 전이 같으면 'three', 2개 전이 같으면 'two', 둘 다 아님 'none'
-  const twoMatch  = i>=2 && seq[i].name===seq[i-2].name;
-  const threeMatch= i>=3 && seq[i].name===seq[i-3].name;
-  if (threeMatch) return 'three';
-  if (twoMatch)   return 'two';
-  return 'none';
+// 실전 모드 시퀀스 생성
+// answers[i]: 'memory' | 'none' | 'two' | 'three' | 'both' (2전=3전 동일)
+function buildRealSeq() {
+  seq=[]; answers=[];
+  const noneProb = NONE_PROB[mode];
+
+  for (let i=0; i<total; i++) {
+    if (i < 3) {
+      // 기억 단계: 완전 랜덤, 단 앞 3개 안에서 중복 최소화
+      let candidates = SHAPES.filter(s => !seq.slice(Math.max(0,i-2),i).some(x=>x.name===s.name));
+      if (!candidates.length) candidates = SHAPES;
+      seq.push(candidates[Math.floor(Math.random()*candidates.length)]);
+      answers.push('memory');
+      continue;
+    }
+
+    const r = Math.random();
+    if (r < noneProb) {
+      // "다름": 2전, 3전과 모두 다른 도형
+      let candidates = SHAPES.filter(s => s.name!==seq[i-2].name && s.name!==seq[i-3].name);
+      if (!candidates.length) candidates = SHAPES;
+      seq.push(candidates[Math.floor(Math.random()*candidates.length)]);
+      answers.push('none');
+    } else {
+      // "같음": 2전 또는 3전과 같은 도형
+      const pickTwo   = Math.random() < 0.5;
+      const pickThree = !pickTwo;
+      // 상 난이도는 가끔 both (2전=3전) 케이스 생성
+      const bothChance = mode==='hard' ? 0.25 : mode==='mid' ? 0.1 : 0.0;
+      if (Math.random() < bothChance) {
+        // both: 2전과 3전을 같은 도형으로 만들고 현재도 그 도형
+        const target = seq[i-2];
+        // 3전 자리를 바꿀 수 없으므로 현재 도형을 2전=3전이 되도록 조정
+        // 실제로는 seq[i-3]과 seq[i-2]가 이미 정해져 있으므로
+        // 2전과 3전이 우연히 같은 경우를 활용
+        if (seq[i-2].name === seq[i-3].name) {
+          seq.push(seq[i-2]);
+          answers.push('both');
+        } else {
+          // 그냥 2전 또는 3전 중 하나 선택
+          seq.push(pickTwo ? seq[i-2] : seq[i-3]);
+          answers.push(pickTwo ? 'two' : 'three');
+        }
+      } else {
+        seq.push(pickTwo ? seq[i-2] : seq[i-3]);
+        answers.push(pickTwo ? 'two' : 'three');
+      }
+    }
+  }
 }
 
 function startGame() {
   clearTimeout(seqTimer); clearInterval(barTimer);
-  mode = document.getElementById('nb-mode').value;
+  document.onkeydown = null;
+  mode  = document.getElementById('nb-mode').value;
   total = parseInt(document.getElementById('nb-total').value);
   seq=[]; answers=[]; userAnswers=[]; current=0; gameActive=true; answered=false;
-  document.getElementById('review-area').innerHTML = '';
+  document.getElementById('review-area').innerHTML='';
 
-  // 시퀀스 생성
-  for (let i=0; i<total; i++) {
-    let shape;
-    if (mode==='real') {
-      // 실전: 랜덤 생성 후 정답 계산
-      shape = SHAPES[Math.floor(Math.random()*SHAPES.length)];
-      seq.push(shape);
-      answers.push(i>=3 ? getRealAnswer(i) : 'memory');
-    } else {
-      const N = parseInt(mode);
+  if (isRealMode()) {
+    buildRealSeq();
+  } else {
+    const N = parseInt(mode);
+    for (let i=0; i<total; i++) {
+      let shape;
       if (i>=N && Math.random()<0.35) { shape=seq[i-N]; answers.push(true); }
       else {
         let c=SHAPES.filter(s=>i<N||s.name!==seq[i-N].name);
@@ -197,62 +234,66 @@ function startGame() {
   updateStats(); showQuestion();
 }
 
+function modeBadgeHTML() {
+  const map = {
+    '2': ['normal','2-back'],
+    '3': ['normal','3-back'],
+    'easy': ['real-easy','실전 — 하'],
+    'mid':  ['real-mid', '실전 — 중'],
+    'hard': ['real-hard','실전 — 상'],
+  };
+  const [cls,label] = map[mode];
+  return `<div class="mode-badge ${cls}">${label}</div>`;
+}
+
 function showQuestion() {
   if (current>=total) { showResult(); return; }
   answered=false;
   const shape=seq[current];
-  const isReal = mode==='real';
-  const N = isReal ? 3 : parseInt(mode);
-  const isActive = current >= N; // 판단 가능 구간
+  const real=isRealMode();
+  const N = real ? 3 : parseInt(mode);
+  const isActive = current >= N;
   const stage=document.getElementById('nb-stage');
 
   let prog='';
   for(let i=0;i<total;i++){
     let cls='';
-    const iAct = isReal ? i>=3 : i>=parseInt(mode);
-    if(i<current && iAct){
-      cls = userAnswers[i]===null ? 'done-timeout' :
-            (isReal ? (userAnswers[i]===answers[i]?'done-correct':'done-wrong')
-                    : (userAnswers[i]===answers[i]?'done-correct':'done-wrong'));
+    const act = real ? i>=3 : i>=parseInt(mode);
+    if(i<current && act){
+      cls = userAnswers[i]===null ? 'done-timeout' : isCorrect(i) ? 'done-correct' : 'done-wrong';
     } else if(i===current) cls='current';
     prog+=`<div class="prog-dot ${cls}"></div>`;
   }
 
-  const modeBadge = isReal
-    ? `<div class="mode-badge real">실전 모드</div>`
-    : `<div class="mode-badge normal">${mode}-back</div>`;
-
-  let buttonsHTML = '';
+  let buttonsHTML='';
   if (isActive) {
-    if (isReal) {
-      buttonsHTML = `
-        <div class="real-btns" id="real-btns">
-          <button class="real-btn none-btn" onclick="answerReal('none')" id="btn-none">
+    if (real) {
+      buttonsHTML=`
+        <div class="real-btns">
+          <button class="real-btn none-btn"  onclick="answerReal('none')"  id="btn-none">
             <span class="key-badge">SPACE</span> 다름 (둘 다 아님)
           </button>
-          <button class="real-btn two-btn" onclick="answerReal('two')" id="btn-two">
+          <button class="real-btn two-btn"   onclick="answerReal('two')"   id="btn-two">
             <span class="key-badge">← 왼쪽</span> 같음 (2번째 전)
           </button>
           <button class="real-btn three-btn" onclick="answerReal('three')" id="btn-three">
             <span class="key-badge">→ 오른쪽</span> 같음 (3번째 전)
           </button>
-        </div>
-      `;
+        </div>`;
     } else {
-      buttonsHTML = `
+      buttonsHTML=`
         <div class="btns">
           <button class="btn same" onclick="answer(true)">같다</button>
           <button class="btn diff" onclick="answer(false)">다르다</button>
-        </div>
-      `;
+        </div>`;
     }
   }
 
   stage.innerHTML=`
-    ${modeBadge}
+    ${modeBadgeHTML()}
     <div class="progress">${prog}</div>
     <div style="font-size:13px;color:#888;">
-      ${isReal ? '2번째 전 또는 3번째 전 도형과 같은지 판단하세요' : `${mode}개 전 도형과 같으면 "같다", 다르면 "다르다"`}
+      ${real ? '2번째 전 또는 3번째 전 도형과 같은지 판단하세요' : `${mode}개 전 도형과 같으면 "같다", 다르면 "다르다"`}
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
       <div class="shape-box">
@@ -274,8 +315,16 @@ function showQuestion() {
     seqTimer=setTimeout(()=>{current++;showQuestion();},1800);
   } else {
     startTimer();
-    if (isReal) setupKeyboard();
+    if (real) setupKeyboard();
   }
+}
+
+// 정답 판정 (both 케이스: two 또는 three 모두 정답)
+function isCorrect(i) {
+  const ua=userAnswers[i], ans=answers[i];
+  if (ua===null) return false;
+  if (ans==='both') return ua==='two' || ua==='three';
+  return ua===ans;
 }
 
 function setupKeyboard() {
@@ -300,16 +349,19 @@ function startTimer() {
   },100);
 }
 
+function correctLabel(ans) {
+  if(ans==='none')  return '다름';
+  if(ans==='two')   return '2번째 전과 같음';
+  if(ans==='three') return '3번째 전과 같음';
+  if(ans==='both')  return '2번째 또는 3번째 전과 같음';
+  return ans?'같다':'다르다';
+}
+
 function onTimeout() {
   if(answered) return;
-  answered=true; userAnswers.push(null);
-  document.onkeydown = null;
+  answered=true; userAnswers.push(null); document.onkeydown=null;
   const fb=document.getElementById('nb-fb');
-  const correct = answers[current];
-  const correctLabel = mode==='real'
-    ? (correct==='none'?'다름':correct==='two'?'2번째 전과 같음':'3번째 전과 같음')
-    : (correct?'같다':'다르다');
-  if(fb){ fb.textContent=`시간 초과! (정답: ${correctLabel})`; fb.className='feedback timeout'; }
+  if(fb){ fb.textContent=`시간 초과! (정답: ${correctLabel(answers[current])})`; fb.className='feedback timeout'; }
   document.querySelectorAll('.btn,.real-btn').forEach(b=>b.disabled=true);
   updateStats();
   seqTimer=setTimeout(()=>{current++;showQuestion();},1000);
@@ -318,9 +370,9 @@ function onTimeout() {
 function answer(val) {
   if(answered) return;
   answered=true; clearInterval(barTimer); userAnswers.push(val);
-  const correct=val===answers[current];
+  const ok=val===answers[current];
   const fb=document.getElementById('nb-fb');
-  if(fb){ fb.textContent=correct?'정답!':`오답 (정답: ${answers[current]?'같다':'다르다'})`; fb.className='feedback '+(correct?'correct':'wrong'); }
+  if(fb){ fb.textContent=ok?'정답!':`오답 (정답: ${correctLabel(answers[current])})`; fb.className='feedback '+(ok?'correct':'wrong'); }
   document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
   updateStats();
   seqTimer=setTimeout(()=>{current++;showQuestion();},900);
@@ -328,26 +380,24 @@ function answer(val) {
 
 function answerReal(val) {
   if(answered) return;
-  answered=true; clearInterval(barTimer);
-  document.onkeydown = null;
+  answered=true; clearInterval(barTimer); document.onkeydown=null;
   userAnswers.push(val);
-  const correct=val===answers[current];
+  const ok=isCorrect(current);
   const fb=document.getElementById('nb-fb');
-  const valLabel = val==='none'?'다름':val==='two'?'2번째 전과 같음':'3번째 전과 같음';
-  const correctLabel = answers[current]==='none'?'다름':answers[current]==='two'?'2번째 전과 같음':'3번째 전과 같음';
-  if(fb){ fb.textContent=correct?'정답!':`오답 — 내 선택: ${valLabel} / 정답: ${correctLabel}`; fb.className='feedback '+(correct?'correct':'wrong'); }
+  const vl=correctLabel(val), cl=correctLabel(answers[current]);
+  if(fb){ fb.textContent=ok?'정답!':`오답 — 내 선택: ${vl} / 정답: ${cl}`; fb.className='feedback '+(ok?'correct':'wrong'); }
   document.querySelectorAll('.real-btn').forEach(b=>b.disabled=true);
   updateStats();
   seqTimer=setTimeout(()=>{current++;showQuestion();},1000);
 }
 
 function updateStats() {
-  const isReal = mode==='real';
-  const startIdx = isReal ? 3 : parseInt(mode);
+  const startIdx = isRealMode() ? 3 : parseInt(mode);
   let c=0,w=0,t=0;
   for(let i=startIdx;i<userAnswers.length;i++){
+    if(answers[i]==='memory') continue;
     if(userAnswers[i]===null){t++;continue;}
-    if(userAnswers[i]===answers[i])c++;else w++;
+    if(isCorrect(i))c++;else w++;
   }
   const tot=c+w+t, acc=tot>0?Math.round(c/tot*100):'-';
   document.getElementById('nb-cur').textContent=gameActive?`${current+1} / ${total}`:'-';
@@ -358,16 +408,15 @@ function updateStats() {
 
 function showResult() {
   gameActive=false; clearInterval(barTimer); document.onkeydown=null;
-  const isReal = mode==='real';
-  const startIdx = isReal ? 3 : parseInt(mode);
+  const startIdx = isRealMode() ? 3 : parseInt(mode);
   let c=0,w=0,t=0;
   for(let i=startIdx;i<userAnswers.length;i++){
+    if(answers[i]==='memory') continue;
     if(userAnswers[i]===null){t++;continue;}
-    if(userAnswers[i]===answers[i])c++;else w++;
+    if(isCorrect(i))c++;else w++;
   }
   const tot=c+w+t, acc=tot>0?Math.round(c/tot*100):0;
   const msg=acc>=80?'훌륭해요! 실전 준비 됐어요 💪':acc>=60?'좋아요! 조금만 더 연습하면 돼요.':'계속 연습하면 금방 늘어요!';
-
   document.getElementById('nb-stage').innerHTML=`
     <div class="result-box">
       <h3>결과</h3>
@@ -383,48 +432,40 @@ function showResult() {
 }
 
 function showReview() {
-  const isReal = mode==='real';
-  const startIdx = isReal ? 3 : parseInt(mode);
-
-  let cardsHTML = '';
-  for (let i=0; i<total; i++) {
+  const real=isRealMode();
+  const startIdx = real ? 3 : parseInt(mode);
+  let cardsHTML='';
+  for(let i=0;i<total;i++){
     const shape=seq[i];
-    const isActive = i>=startIdx;
+    const act=i>=startIdx && answers[i]!=='memory';
     let boxClass='memory', statusLabel='기억중', statusClass='memory';
-
-    if (isActive) {
+    if(act){
       const ua=userAnswers[i];
-      if(ua===null)             { boxClass='timeout'; statusLabel='시간초과'; statusClass='timeout'; }
-      else if(ua===answers[i])  { boxClass='correct'; statusLabel='정답';    statusClass='correct'; }
-      else                      { boxClass='wrong';   statusLabel='오답';    statusClass='wrong'; }
+      if(ua===null)       { boxClass='timeout'; statusLabel='시간초과'; statusClass='timeout'; }
+      else if(isCorrect(i)){ boxClass='correct'; statusLabel='정답';    statusClass='correct'; }
+      else                { boxClass='wrong';   statusLabel='오답';    statusClass='wrong'; }
     }
-
-    let refHTML = '<div class="review-card-ref" style="color:transparent;">-</div>';
-    if (isActive && isReal) {
-      const two   = i>=2 ? seq[i-2].name : '-';
-      const three = i>=3 ? seq[i-3].name : '-';
-      const ans   = answers[i];
-      const ansLabel = ans==='none'?'다름':ans==='two'?`2전=${two}`:ans==='three'?`3전=${three}`:'?';
-      refHTML = `<div class="review-card-ref">2전:${two}<br>3전:${three}<br>정답:${ansLabel}</div>`;
-    } else if (isActive && !isReal) {
+    let refHTML='<div class="review-card-ref" style="color:transparent;">-</div>';
+    if(act && real){
+      const two  =i>=2?seq[i-2].name:'-';
+      const three=i>=3?seq[i-3].name:'-';
+      const ans=answers[i];
+      const al=ans==='both'?`2전=3전(${two})`:ans==='none'?'다름':ans==='two'?`2전=${two}`:`3전=${three}`;
+      refHTML=`<div class="review-card-ref">2전:${two}<br>3전:${three}<br>정답:${al}</div>`;
+    } else if(act && !real){
       const N=parseInt(mode);
-      const ref=seq[i-N];
-      refHTML=`<div class="review-card-ref">${N}개전: ${ref.name}<br>${answers[i]?'→ 같음':'→ 다름'}</div>`;
+      refHTML=`<div class="review-card-ref">${N}개전:${seq[i-N].name}<br>${answers[i]?'→ 같음':'→ 다름'}</div>`;
     }
-
     cardsHTML+=`
       <div class="review-card">
         <div class="review-card-box ${boxClass}">
-          <div class="review-card-num">${i+1}</div>
-          ${shape.svg}
+          <div class="review-card-num">${i+1}</div>${shape.svg}
         </div>
         <div class="review-card-name">${shape.name}</div>
         <div class="review-card-status ${statusClass}">${statusLabel}</div>
         ${refHTML}
-      </div>
-    `;
+      </div>`;
   }
-
   document.getElementById('review-area').innerHTML=`
     <div class="review-wrap">
       <div class="review-title">전체 복기 — 도형 순서 확인</div>
@@ -435,8 +476,7 @@ function showReview() {
         <span><span class="legend-dot" style="background:#ddd;"></span>기억 단계</span>
       </div>
       <div class="review-sequence">${cardsHTML}</div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('review-area').scrollIntoView({behavior:'smooth',block:'start'});
 }
 </script>
